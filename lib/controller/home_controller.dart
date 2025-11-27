@@ -88,6 +88,10 @@ class HomeController extends GetxController {
   final String propertiesApi =
       "https://apimanager.viskorealestate.com/fetch-all-properties";
 
+  get bannerImages => null;
+
+  get bannerIndex => null;
+
   @override
   void onInit() {
     super.onInit();

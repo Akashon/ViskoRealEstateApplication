@@ -1,16 +1,345 @@
-// import 'dart:convert';
-// import 'dart:ui';
-// import 'package:flutter/material.dart';
-// import 'package:http/http.dart' as http;
-// import 'package:get/get.dart';
-// import 'package:visko_rocky_flutter/controller/theme_controller.dart';
-// import 'package:visko_rocky_flutter/pages/property_detail_page.dart';
+// // import 'dart:ui';
+// // import 'dart:convert';
+// // import 'package:flutter/material.dart';
+// // import 'package:get/get.dart';
+// // import 'package:http/http.dart' as http;
 
-// const Color kPrimaryOrange = Color(0xffF26A33);
+// // import 'package:visko_rocky_flutter/component/home_property_card.dart';
+// // import 'package:visko_rocky_flutter/controller/theme_controller.dart';
+// // import 'package:visko_rocky_flutter/theme/app_theme.dart';
+
+// // class DeveloperProperties extends StatefulWidget {
+// //   final String slug;
+// //   const DeveloperProperties({required this.slug});
+
+// //   @override
+// //   State<DeveloperProperties> createState() => _DeveloperPropertiesState();
+// // }
+
+// // class _DeveloperPropertiesState extends State<DeveloperProperties> {
+// //   Map<String, dynamic>? developer;
+// //   List<dynamic> properties = [];
+// //   bool isLoading = true;
+
+// //   final themeController = Get.find<ThemeController>();
+
+// //   @override
+// //   void initState() {
+// //     super.initState();
+// //     fetchDeveloperDetails();
+// //   }
+
+// //   Future<void> fetchDeveloperDetails() async {
+// //     final url =
+// //         'https://apimanager.viskorealestate.com/fetch-single-developer?slug=${widget.slug}';
+// //     final response = await http.get(Uri.parse(url));
+
+// //     if (response.statusCode == 200) {
+// //       final result = jsonDecode(response.body);
+// //       if (result['developer'] != null) {
+// //         setState(() {
+// //           developer = result['developer'];
+// //           properties = result['properties'] ?? [];
+// //           isLoading = false;
+// //         });
+// //       } else {
+// //         setState(() => isLoading = false);
+// //       }
+// //     } else {
+// //       setState(() => isLoading = false);
+// //     }
+// //   }
+
+// //   @override
+// //   Widget build(BuildContext context) {
+// //     final glass = Theme.of(context).extension<GlassColors>()!;
+
+// //     return Scaffold(
+// //       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+// //       body: Stack(
+// //         children: [
+// //           /// ------------------- HEADER -------------------
+// //           Container(
+// //             height: MediaQuery.of(context).size.height * 0.26,
+// //             decoration: BoxDecoration(
+// //               borderRadius: const BorderRadius.only(
+// //                 bottomLeft: Radius.circular(18),
+// //                 bottomRight: Radius.circular(18),
+// //               ),
+// //               gradient: LinearGradient(
+// //                 colors: [
+// //                   glass.cardBackground.withOpacity(0.9),
+// //                   glass.cardBackground.withOpacity(0.7),
+// //                 ],
+// //                 begin: Alignment.topLeft,
+// //                 end: Alignment.bottomRight,
+// //               ),
+// //             ),
+// //           ),
+
+// //           SafeArea(
+// //             child: isLoading
+// //                 ? const Center(child: CircularProgressIndicator())
+// //                 : developer == null
+// //                     ? const Center(child: Text("Developer not found"))
+// //                     : Padding(
+// //                         padding: const EdgeInsets.symmetric(horizontal: 16),
+// //                         child: ListView(
+// //                           children: [
+// //                             const SizedBox(height: 10),
+
+// //                             /// ------------------- TOP BAR -------------------
+// //                             Row(
+// //                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+// //                               children: [
+// //                                 _glassBackButton(glass),
+// //                                 Text(
+// //                                   developer!['developer_name'] ?? '',
+// //                                   style: TextStyle(
+// //                                     fontSize: 18,
+// //                                     fontWeight: FontWeight.bold,
+// //                                     color: glass.textPrimary,
+// //                                   ),
+// //                                 ),
+// //                                 const SizedBox(width: 40),
+// //                               ],
+// //                             ),
+
+// //                             const SizedBox(height: 18),
+
+// //                             /// ------------------- DEVELOPER HEADER -------------------
+// //                             _buildDeveloperHeader(glass),
+
+// //                             const SizedBox(height: 26),
+
+// //                             Text(
+// //                               "Properties by ${developer!['developer_name']}",
+// //                               style: TextStyle(
+// //                                 fontSize: 18,
+// //                                 fontWeight: FontWeight.w700,
+// //                                 color: glass.textPrimary,
+// //                               ),
+// //                             ),
+
+// //                             const SizedBox(height: 14),
+
+// //                             ...properties
+// //                                 .map((p) => _buildGlassPropertyCard(p, glass))
+// //                                 .toList(),
+// //                           ],
+// //                         ),
+// //                       ),
+// //           ),
+// //         ],
+// //       ),
+// //     );
+// //   }
+
+// //   /// ------------------- BACK BUTTON -------------------
+// //   Widget _glassBackButton(GlassColors glass) {
+// //     return GestureDetector(
+// //       onTap: () => Navigator.pop(context),
+// //       child: ClipRRect(
+// //         borderRadius: BorderRadius.circular(50),
+// //         child: BackdropFilter(
+// //           filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
+// //           child: Container(
+// //             height: 40,
+// //             width: 40,
+// //             decoration: BoxDecoration(
+// //               color: glass.cardBackground,
+// //               shape: BoxShape.circle,
+// //               border: Border.all(color: glass.glassBorder),
+// //             ),
+// //             child: Icon(Icons.arrow_back_rounded, color: glass.textPrimary),
+// //           ),
+// //         ),
+// //       ),
+// //     );
+// //   }
+
+// //   /// ------------------- DEVELOPER HEADER -------------------
+// //   Widget _buildDeveloperHeader(GlassColors glass) {
+// //     return ClipRRect(
+// //       borderRadius: BorderRadius.circular(20),
+// //       child: BackdropFilter(
+// //         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+// //         child: Container(
+// //           padding: const EdgeInsets.all(16),
+// //           decoration: BoxDecoration(
+// //             color: glass.cardBackground,
+// //             borderRadius: BorderRadius.circular(20),
+// //             border: Border.all(color: glass.glassBorder),
+// //           ),
+// //           child: Row(
+// //             children: [
+// //               ClipRRect(
+// //                 borderRadius: BorderRadius.circular(14),
+// //                 child: Image.network(
+// //                   developer!['developer_logo'] ?? '',
+// //                   height: 95,
+// //                   width: 140,
+// //                   fit: BoxFit.cover,
+// //                 ),
+// //               ),
+// //               const SizedBox(width: 16),
+// //               Expanded(
+// //                 child: Column(
+// //                   crossAxisAlignment: CrossAxisAlignment.start,
+// //                   children: [
+// //                     Text(
+// //                       developer!['developer_name'],
+// //                       style: TextStyle(
+// //                         fontSize: 18,
+// //                         fontWeight: FontWeight.bold,
+// //                         color: glass.textPrimary,
+// //                       ),
+// //                     ),
+// //                     const SizedBox(height: 6),
+// //                     Row(
+// //                       children: [
+// //                         Icon(
+// //                           Icons.location_on,
+// //                           size: 16,
+// //                           color: kPrimaryOrange,
+// //                         ),
+// //                         const SizedBox(width: 6),
+// //                         Expanded(
+// //                           child: Text(
+// //                             developer!['developer_city'] ?? '',
+// //                             style: TextStyle(color: glass.textSecondary),
+// //                           ),
+// //                         ),
+// //                       ],
+// //                     ),
+// //                     const SizedBox(height: 6),
+// //                     Text(
+// //                       "📞 ${developer!['developer_mobile_number']}",
+// //                       style: TextStyle(color: glass.textSecondary),
+// //                     ),
+// //                   ],
+// //                 ),
+// //               ),
+// //             ],
+// //           ),
+// //         ),
+// //       ),
+// //     );
+// //   }
+
+// //   /// ------------------- PROPERTY CARD -------------------
+// //   Widget _buildGlassPropertyCard(
+// //       Map<String, dynamic> property, GlassColors glass) {
+// //     final imageUrl = property['property_images'] != null &&
+// //             property['property_images'].isNotEmpty
+// //         ? property['property_images'][0]
+// //         : 'https://via.placeholder.com/400x200';
+
+// //     return ClipRRect(
+// //       borderRadius: BorderRadius.circular(18),
+// //       child: BackdropFilter(
+// //         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+// //         child: Container(
+// //           margin: const EdgeInsets.only(bottom: 18),
+// //           decoration: BoxDecoration(
+// //             color: glass.cardBackground,
+// //             borderRadius: BorderRadius.circular(18),
+// //             border: Border.all(color: glass.glassBorder),
+// //           ),
+// //           child: Column(
+// //             crossAxisAlignment: CrossAxisAlignment.start,
+// //             children: [
+// //               /// IMAGE
+// //               ClipRRect(
+// //                 borderRadius:
+// //                     const BorderRadius.vertical(top: Radius.circular(18)),
+// //                 child: Image.network(
+// //                   imageUrl,
+// //                   height: 170,
+// //                   width: double.infinity,
+// //                   fit: BoxFit.cover,
+// //                 ),
+// //               ),
+
+// //               /// DETAILS
+// //               Padding(
+// //                 padding:
+// //                     const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+// //                 child: Column(
+// //                   crossAxisAlignment: CrossAxisAlignment.start,
+// //                   children: [
+// //                     Text(
+// //                       property['property_name'] ?? 'No Title',
+// //                       style: TextStyle(
+// //                         fontSize: 16,
+// //                         fontWeight: FontWeight.bold,
+// //                         color: glass.textPrimary,
+// //                       ),
+// //                     ),
+// //                     const SizedBox(height: 6),
+// //                     Row(
+// //                       children: [
+// //                         Icon(Icons.location_on,
+// //                             size: 14, color: kPrimaryOrange),
+// //                         const SizedBox(width: 4),
+// //                         Expanded(
+// //                           child: Text(
+// //                             property['property_city'] ?? '',
+// //                             style: TextStyle(
+// //                               fontSize: 12,
+// //                               color: glass.textSecondary,
+// //                             ),
+// //                           ),
+// //                         ),
+// //                       ],
+// //                     ),
+// //                     const SizedBox(height: 6),
+// //                     Row(
+// //                       children: [
+// //                         Icon(Icons.villa, size: 12, color: kPrimaryOrange),
+// //                         const SizedBox(width: 4),
+// //                         Text(
+// //                           property['property_type'] ?? '',
+// //                           style: TextStyle(
+// //                             fontSize: 11,
+// //                             color: glass.textSecondary,
+// //                           ),
+// //                         ),
+// //                         const SizedBox(width: 14),
+// //                         Icon(Icons.category, size: 12, color: kPrimaryOrange),
+// //                         const SizedBox(width: 4),
+// //                         Text(
+// //                           property['property_category'] ?? '',
+// //                           style: TextStyle(
+// //                             fontSize: 11,
+// //                             color: glass.textSecondary,
+// //                           ),
+// //                         ),
+// //                       ],
+// //                     ),
+// //                   ],
+// //                 ),
+// //               ),
+// //             ],
+// //           ),
+// //         ),
+// //       ),
+// //     );
+// //   }
+// // }
+
+// import 'dart:ui';
+// import 'dart:convert';
+// import 'package:flutter/material.dart';
+// import 'package:get/get.dart';
+// import 'package:http/http.dart' as http;
+// import 'package:visko_rocky_flutter/component/home_property_card.dart';
+// import '../controller/theme_controller.dart';
+// import 'package:visko_rocky_flutter/theme/app_theme.dart';
 
 // class DeveloperProperties extends StatefulWidget {
 //   final String slug;
-//   const DeveloperProperties({required this.slug});
+//   const DeveloperProperties({required this.slug, super.key});
 
 //   @override
 //   State<DeveloperProperties> createState() => _DeveloperPropertiesState();
@@ -19,11 +348,9 @@
 // class _DeveloperPropertiesState extends State<DeveloperProperties> {
 //   Map<String, dynamic>? developer;
 //   List<dynamic> properties = [];
-//   List<dynamic> filteredProperties = [];
 //   bool isLoading = true;
-//   final ThemeController themeController = Get.find<ThemeController>();
-//   String selectedType = '';
-//   String selectedCategory = '';
+
+//   final themeController = Get.find<ThemeController>();
 
 //   @override
 //   void initState() {
@@ -35,221 +362,136 @@
 //     final url =
 //         'https://apimanager.viskorealestate.com/fetch-single-developer?slug=${widget.slug}';
 //     final response = await http.get(Uri.parse(url));
+
 //     if (response.statusCode == 200) {
 //       final result = jsonDecode(response.body);
-//       setState(() {
-//         developer = result['developer'];
-//         properties = result['properties'] ?? [];
-//         filteredProperties = properties;
-//         isLoading = false;
-//       });
+//       if (result['developer'] != null) {
+//         setState(() {
+//           developer = result['developer'];
+//           properties = result['properties'] ?? [];
+//           isLoading = false;
+//         });
+//       } else {
+//         setState(() => isLoading = false);
+//       }
 //     } else {
 //       setState(() => isLoading = false);
 //     }
 //   }
 
-//   void filterProperties() {
-//     setState(() {
-//       filteredProperties = properties.where((p) {
-//         final matchesType =
-//             selectedType.isEmpty || p['property_type'] == selectedType;
-//         final matchesCategory =
-//             selectedCategory.isEmpty ||
-//             p['property_category'] == selectedCategory;
-//         return matchesType && matchesCategory;
-//       }).toList();
-//     });
-//   }
-
 //   @override
 //   Widget build(BuildContext context) {
-//     final isDark = Theme.of(context).brightness == Brightness.dark;
-
-//     // Extract unique types and categories
-//     final types = properties
-//         .map((p) => p['property_type'] ?? 'Unknown')
-//         .toSet()
-//         .toList();
-//     final categories = properties
-//         .map((p) => p['property_category'] ?? 'Unknown')
-//         .toSet()
-//         .toList();
+//     final glass = Theme.of(context).extension<GlassColors>()!;
+//     final isDark = themeController.isDark.value;
 
 //     return Scaffold(
 //       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-//       appBar: AppBar(
-//         backgroundColor: isDark
-//             ? Colors.black.withOpacity(0.6)
-//             : kPrimaryOrange.withOpacity(0.8),
-//         title: Text(
-//           developer != null ? developer!['developer_name'] : 'Loading...',
-//           style: const TextStyle(color: Colors.white),
-//         ),
-//       ),
-//       body: isLoading
-//           ? const Center(child: CircularProgressIndicator())
-//           : developer == null
-//           ? const Center(child: Text("Developer not found"))
-//           : SingleChildScrollView(
-//               padding: const EdgeInsets.all(16),
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   _buildDeveloperHeader(isDark),
-//                   const SizedBox(height: 24),
-
-//                   // ---------------- FILTER CHIPS ----------------
-//                   Text(
-//                     "Filter by Type",
-//                     style: TextStyle(
-//                       fontSize: 16,
-//                       fontWeight: FontWeight.bold,
-//                       color: isDark ? Colors.white : Colors.black87,
-//                     ),
-//                   ),
-//                   const SizedBox(height: 8),
-//                   SizedBox(
-//                     height: 40,
-//                     child: ListView.builder(
-//                       scrollDirection: Axis.horizontal,
-//                       itemCount: types.length,
-//                       itemBuilder: (_, index) {
-//                         final type = types[index];
-//                         return glassChip(
-//                           type,
-//                           selected: selectedType == type,
-//                           isDark: isDark,
-//                           onTap: () {
-//                             selectedType = selectedType == type ? '' : type;
-//                             filterProperties();
-//                           },
-//                         );
-//                       },
-//                     ),
-//                   ),
-//                   const SizedBox(height: 12),
-//                   Text(
-//                     "Filter by Category",
-//                     style: TextStyle(
-//                       fontSize: 16,
-//                       fontWeight: FontWeight.bold,
-//                       color: isDark ? Colors.white : Colors.black87,
-//                     ),
-//                   ),
-//                   const SizedBox(height: 8),
-//                   SizedBox(
-//                     height: 40,
-//                     child: ListView.builder(
-//                       scrollDirection: Axis.horizontal,
-//                       itemCount: categories.length,
-//                       itemBuilder: (_, index) {
-//                         final category = categories[index];
-//                         return glassChip(
-//                           category,
-//                           selected: selectedCategory == category,
-//                           isDark: isDark,
-//                           onTap: () {
-//                             selectedCategory = selectedCategory == category
-//                                 ? ''
-//                                 : category;
-//                             filterProperties();
-//                           },
-//                         );
-//                       },
-//                     ),
-//                   ),
-//                   const SizedBox(height: 24),
-
-//                   Text(
-//                     "Properties by ${developer!['developer_name']}",
-//                     style: TextStyle(
-//                       fontSize: 20,
-//                       fontWeight: FontWeight.bold,
-//                       color: isDark ? Colors.white : Colors.black87,
-//                     ),
-//                   ),
-//                   const SizedBox(height: 12),
-
-//                   ...filteredProperties
-//                       .map((p) => _buildPropertyCard(p, isDark))
-//                       .toList(),
-//                 ],
+//       body: Stack(
+//         children: [
+//           /// ------------------- GLASS HEADER -------------------
+//           Container(
+//             height: MediaQuery.of(context).size.height * 0.26,
+//             decoration: BoxDecoration(
+//               borderRadius: const BorderRadius.only(
+//                 bottomLeft: Radius.circular(18),
+//                 bottomRight: Radius.circular(18),
+//               ),
+//               gradient: LinearGradient(
+//                 colors: isDark
+//                     ? [Colors.black87, Colors.black54]
+//                     : [
+//                         kPrimaryOrange.withOpacity(0.7),
+//                         Colors.orange.shade200.withOpacity(0.4)
+//                       ],
+//                 begin: Alignment.topLeft,
+//                 end: Alignment.bottomRight,
 //               ),
 //             ),
+//           ),
+
+//           SafeArea(
+//             child: isLoading
+//                 ? const Center(child: CircularProgressIndicator())
+//                 : developer == null
+//                     ? const Center(child: Text("Developer not found"))
+//                     : Padding(
+//                         padding: const EdgeInsets.symmetric(horizontal: 16),
+//                         child: ListView(
+//                           children: [
+//                             const SizedBox(height: 10),
+
+//                             /// ------------------- TOP BAR -------------------
+//                             Row(
+//                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                               children: [
+//                                 _glassBackButton(glass),
+//                                 Text(
+//                                   developer!['developer_name'] ?? '',
+//                                   style: TextStyle(
+//                                     fontSize: 18,
+//                                     fontWeight: FontWeight.bold,
+//                                     color: glass.textPrimary,
+//                                   ),
+//                                 ),
+//                                 const SizedBox(width: 40),
+//                               ],
+//                             ),
+
+//                             const SizedBox(height: 18),
+
+//                             /// ------------------- DEVELOPER HEADER -------------------
+//                             _buildDeveloperHeader(glass),
+
+//                             const SizedBox(height: 26),
+
+//                             Text(
+//                               "Properties by ${developer!['developer_name']}",
+//                               style: TextStyle(
+//                                 fontSize: 18,
+//                                 fontWeight: FontWeight.w700,
+//                                 color: glass.textPrimary,
+//                               ),
+//                             ),
+
+//                             const SizedBox(height: 14),
+
+//                             ...properties
+//                                 .map((p) => _buildGlassPropertyCard(p, glass))
+//                                 .toList(),
+//                           ],
+//                         ),
+//                       ),
+//           ),
+//         ],
+//       ),
 //     );
 //   }
 
-//   // ---------------- GLASS CHIPS ----------------
-//   Widget glassChip(
-//     String title, {
-//     required bool selected,
-//     required bool isDark,
-//     required VoidCallback onTap,
-//   }) {
+//   /// ------------------- BACK BUTTON -------------------
+//   Widget _glassBackButton(GlassColors glass) {
 //     return GestureDetector(
-//       onTap: onTap,
-//       child: Padding(
-//         padding: const EdgeInsets.only(right: 12),
-//         child: AnimatedContainer(
-//           duration: const Duration(milliseconds: 250),
-//           decoration: BoxDecoration(
-//             borderRadius: BorderRadius.circular(20),
-//             gradient: selected
-//                 ? LinearGradient(
-//                     colors: [
-//                       kPrimaryOrange.withOpacity(0.45),
-//                       kPrimaryOrange.withOpacity(0.25),
-//                     ],
-//                     begin: Alignment.topLeft,
-//                     end: Alignment.bottomRight,
-//                   )
-//                 : LinearGradient(
-//                     colors: isDark
-//                         ? [
-//                             Colors.white.withOpacity(0.1),
-//                             Colors.white.withOpacity(0.05),
-//                           ]
-//                         : [
-//                             Colors.white.withOpacity(0.7),
-//                             Colors.white.withOpacity(0.5),
-//                           ],
-//                   ),
-//             border: Border.all(
-//               color: selected
-//                   ? Colors.orange.shade800
-//                   : isDark
-//                   ? Colors.white24
-//                   : Colors.orange.shade200,
+//       onTap: () => Navigator.pop(context),
+//       child: ClipRRect(
+//         borderRadius: BorderRadius.circular(50),
+//         child: BackdropFilter(
+//           filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
+//           child: Container(
+//             height: 40,
+//             width: 40,
+//             decoration: BoxDecoration(
+//               color: glass.cardBackground,
+//               shape: BoxShape.circle,
+//               border: Border.all(color: glass.glassBorder),
 //             ),
-//             boxShadow: selected
-//                 ? [
-//                     BoxShadow(
-//                       color: kPrimaryOrange.withOpacity(0.4),
-//                       blurRadius: 8,
-//                       offset: const Offset(0, 4),
-//                     ),
-//                   ]
-//                 : [],
-//           ),
-//           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-//           child: Text(
-//             title,
-//             style: TextStyle(
-//               color: selected
-//                   ? Colors.white
-//                   : isDark
-//                   ? Colors.white
-//                   : Colors.black87,
-//               fontSize: 12,
-//               fontWeight: FontWeight.w600,
-//             ),
+//             child: Icon(Icons.arrow_back_rounded, color: glass.textPrimary),
 //           ),
 //         ),
 //       ),
 //     );
 //   }
 
-//   Widget _buildDeveloperHeader(bool isDark) {
+//   /// ------------------- DEVELOPER HEADER CARD -------------------
+//   Widget _buildDeveloperHeader(GlassColors glass) {
 //     return ClipRRect(
 //       borderRadius: BorderRadius.circular(20),
 //       child: BackdropFilter(
@@ -257,41 +499,19 @@
 //         child: Container(
 //           padding: const EdgeInsets.all(16),
 //           decoration: BoxDecoration(
-//             gradient: isDark
-//                 ? LinearGradient(
-//                     colors: [
-//                       Colors.white.withOpacity(0.05),
-//                       Colors.white.withOpacity(0.1),
-//                     ],
-//                     begin: Alignment.topLeft,
-//                     end: Alignment.bottomRight,
-//                   )
-//                 : LinearGradient(
-//                     colors: [
-//                       Colors.white.withOpacity(0.7),
-//                       Colors.white.withOpacity(0.5),
-//                     ],
-//                   ),
+//             color: glass.cardBackground,
 //             borderRadius: BorderRadius.circular(20),
-//             border: Border.all(
-//               color: isDark ? Colors.white24 : Colors.orange.shade200,
-//             ),
+//             border: Border.all(color: glass.glassBorder),
 //           ),
 //           child: Row(
 //             children: [
 //               ClipRRect(
-//                 borderRadius: BorderRadius.circular(12),
+//                 borderRadius: BorderRadius.circular(14),
 //                 child: Image.network(
 //                   developer!['developer_logo'] ?? '',
-//                   height: 80,
-//                   width: 120,
+//                   height: 95,
+//                   width: 140,
 //                   fit: BoxFit.cover,
-//                   errorBuilder: (context, error, stackTrace) => Container(
-//                     height: 80,
-//                     width: 80,
-//                     color: Colors.grey[300],
-//                     child: const Icon(Icons.error),
-//                   ),
 //                 ),
 //               ),
 //               const SizedBox(width: 16),
@@ -300,32 +520,31 @@
 //                   crossAxisAlignment: CrossAxisAlignment.start,
 //                   children: [
 //                     Text(
-//                       developer!['developer_name'],
+//                       developer!['developer_name'] ?? '',
 //                       style: TextStyle(
-//                         fontSize: 20,
+//                         fontSize: 18,
 //                         fontWeight: FontWeight.bold,
-//                         color: isDark ? Colors.white : Colors.black87,
+//                         color: glass.textPrimary,
 //                       ),
 //                     ),
 //                     const SizedBox(height: 6),
-//                     Text(
-//                       "${developer!['developer_city']}, ${developer!['developer_state']}",
-//                       style: TextStyle(
-//                         color: isDark ? Colors.white70 : Colors.black54,
-//                       ),
+//                     Row(
+//                       children: [
+//                         Icon(Icons.location_on,
+//                             size: 16, color: kPrimaryOrange),
+//                         const SizedBox(width: 6),
+//                         Expanded(
+//                           child: Text(
+//                             developer!['developer_city'] ?? '',
+//                             style: TextStyle(color: glass.textSecondary),
+//                           ),
+//                         ),
+//                       ],
 //                     ),
 //                     const SizedBox(height: 6),
 //                     Text(
-//                       "📞 ${developer!['developer_mobile_number']}",
-//                       style: TextStyle(
-//                         color: isDark ? Colors.white70 : Colors.black87,
-//                       ),
-//                     ),
-//                     Text(
-//                       "✉️ ${developer!['developer_email_address']}",
-//                       style: TextStyle(
-//                         color: isDark ? Colors.white70 : Colors.black87,
-//                       ),
+//                       "📞 ${developer!['developer_mobile_number'] ?? ''}",
+//                       style: TextStyle(color: glass.textSecondary),
 //                     ),
 //                   ],
 //                 ),
@@ -337,117 +556,103 @@
 //     );
 //   }
 
-//   Widget _buildPropertyCard(Map<String, dynamic> property, bool isDark) {
-//     final imageUrl =
-//         property['property_images'] != null &&
+//   /// ------------------- PROPERTY CARD -------------------
+//   Widget _buildGlassPropertyCard(
+//     Map<String, dynamic> property,
+//     GlassColors glass,
+//   ) {
+//     final imageUrl = property['property_images'] != null &&
 //             property['property_images'].isNotEmpty
 //         ? property['property_images'][0]
 //         : 'https://via.placeholder.com/400x200';
 
-//     return GestureDetector(
-//       onTap: () {
-//         Get.to(() => PropertyDetailPage(slug: property['property_slug']));
-//       },
-//       child: ClipRRect(
-//         borderRadius: BorderRadius.circular(20),
-//         child: BackdropFilter(
-//           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-//           child: Container(
-//             margin: const EdgeInsets.symmetric(vertical: 8),
-//             decoration: BoxDecoration(
-//               color: isDark
-//                   ? Colors.white.withOpacity(0.08)
-//                   : Colors.white.withOpacity(0.6),
-//               borderRadius: BorderRadius.circular(20),
-//               border: Border.all(
-//                 color: isDark ? Colors.white24 : Colors.orange.shade200,
+//     return ClipRRect(
+//       borderRadius: BorderRadius.circular(18),
+//       child: BackdropFilter(
+//         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+//         child: Container(
+//           margin: const EdgeInsets.only(bottom: 18),
+//           decoration: BoxDecoration(
+//             color: glass.cardBackground,
+//             borderRadius: BorderRadius.circular(18),
+//             border: Border.all(color: glass.glassBorder),
+//           ),
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               /// IMAGE
+//               ClipRRect(
+//                 borderRadius: const BorderRadius.vertical(
+//                   top: Radius.circular(18),
+//                 ),
+//                 child: Image.network(
+//                   imageUrl,
+//                   height: 170,
+//                   width: double.infinity,
+//                   fit: BoxFit.cover,
+//                 ),
 //               ),
-//               boxShadow: [
-//                 BoxShadow(
-//                   color: isDark
-//                       ? Colors.black.withOpacity(0.4)
-//                       : Colors.orange.withOpacity(0.25),
-//                   blurRadius: 12,
-//                   offset: const Offset(0, 4),
-//                 ),
-//               ],
-//             ),
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 ClipRRect(
-//                   borderRadius: const BorderRadius.vertical(
-//                     top: Radius.circular(20),
-//                   ),
-//                   child: Image.network(
-//                     imageUrl,
-//                     height: 180,
-//                     width: double.infinity,
-//                     fit: BoxFit.cover,
-//                     errorBuilder: (context, error, stackTrace) =>
-//                         Container(color: Colors.grey, height: 180),
-//                   ),
-//                 ),
-//                 Padding(
-//                   padding: const EdgeInsets.symmetric(
-//                     horizontal: 16,
-//                     vertical: 12,
-//                   ),
-//                   child: Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       Text(
-//                         property['property_name'] ?? 'No Title',
-//                         style: TextStyle(
-//                           fontSize: 18,
-//                           fontWeight: FontWeight.w600,
-//                           color: isDark ? Colors.white : Colors.black87,
-//                         ),
+
+//               /// DETAILS
+//               Padding(
+//                 padding:
+//                     const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+//                 child: Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: [
+//                     Text(
+//                       property['property_name'] ?? 'No Title',
+//                       style: TextStyle(
+//                         fontSize: 16,
+//                         fontWeight: FontWeight.bold,
+//                         color: glass.textPrimary,
 //                       ),
-//                       const SizedBox(height: 4),
-//                       Text(
-//                         property['property_address'] ?? '',
-//                         style: TextStyle(
-//                           color: isDark ? Colors.white70 : Colors.grey.shade600,
-//                         ),
-//                       ),
-//                       const SizedBox(height: 6),
-//                       Row(
-//                         children: [
-//                           Icon(
-//                             Icons.villa,
-//                             size: 18,
-//                             color: isDark ? Colors.white70 : kPrimaryOrange,
-//                           ),
-//                           const SizedBox(width: 4),
-//                           Text(
-//                             property['property_type'] ?? '',
+//                     ),
+//                     const SizedBox(height: 6),
+//                     Row(
+//                       children: [
+//                         Icon(Icons.location_on,
+//                             size: 14, color: kPrimaryOrange),
+//                         const SizedBox(width: 4),
+//                         Expanded(
+//                           child: Text(
+//                             property['property_city'] ?? '',
 //                             style: TextStyle(
 //                               fontSize: 12,
-//                               color: isDark ? Colors.white70 : Colors.black87,
+//                               color: glass.textSecondary,
 //                             ),
 //                           ),
-//                           const SizedBox(width: 12),
-//                           Icon(
-//                             Icons.category,
-//                             size: 18,
-//                             color: isDark ? Colors.white70 : kPrimaryOrange,
+//                         ),
+//                       ],
+//                     ),
+//                     const SizedBox(height: 6),
+//                     Row(
+//                       children: [
+//                         Icon(Icons.villa, size: 12, color: kPrimaryOrange),
+//                         const SizedBox(width: 4),
+//                         Text(
+//                           property['property_type'] ?? '',
+//                           style: TextStyle(
+//                             fontSize: 11,
+//                             color: glass.textSecondary,
 //                           ),
-//                           const SizedBox(width: 4),
-//                           Text(
-//                             property['property_category'] ?? '',
-//                             style: TextStyle(
-//                               fontSize: 12,
-//                               color: isDark ? Colors.white70 : Colors.black87,
-//                             ),
+//                         ),
+//                         const SizedBox(width: 14),
+//                         Icon(Icons.category, size: 12, color: kPrimaryOrange),
+//                         const SizedBox(width: 4),
+//                         Text(
+//                           property['property_category'] ?? '',
+//                           style: TextStyle(
+//                             fontSize: 11,
+//                             color: glass.textSecondary,
 //                           ),
-//                         ],
-//                       ),
-//                     ],
-//                   ),
+//                         ),
+//                       ],
+//                     ),
+//                   ],
 //                 ),
-//               ],
-//             ),
+//               ),
+//             ],
 //           ),
 //         ),
 //       ),
@@ -458,14 +663,17 @@
 import 'dart:ui';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-
-const Color kPrimaryOrange = Color(0xffF26A33);
+import 'package:visko_rocky_flutter/component/home_property_card.dart';
+import 'package:visko_rocky_flutter/component/inquiry_form.dart'
+    hide kPrimaryOrange;
+import '../controller/theme_controller.dart';
+import 'package:visko_rocky_flutter/theme/app_theme.dart';
 
 class DeveloperProperties extends StatefulWidget {
   final String slug;
-  const DeveloperProperties({required this.slug});
-
+  const DeveloperProperties({required this.slug, super.key});
   @override
   State<DeveloperProperties> createState() => _DeveloperPropertiesState();
 }
@@ -474,6 +682,8 @@ class _DeveloperPropertiesState extends State<DeveloperProperties> {
   Map<String, dynamic>? developer;
   List<dynamic> properties = [];
   bool isLoading = true;
+
+  final themeController = Get.find<ThemeController>();
 
   @override
   void initState() {
@@ -504,7 +714,8 @@ class _DeveloperPropertiesState extends State<DeveloperProperties> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final glass = Theme.of(context).extension<GlassColors>()!;
+    final isDark = themeController.isDark.value;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -512,7 +723,7 @@ class _DeveloperPropertiesState extends State<DeveloperProperties> {
         children: [
           /// ------------------- GLASS HEADER -------------------
           Container(
-            height: MediaQuery.of(context).size.height * 0.28,
+            height: MediaQuery.of(context).size.height * 0.26,
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(18),
@@ -520,18 +731,10 @@ class _DeveloperPropertiesState extends State<DeveloperProperties> {
               ),
               gradient: LinearGradient(
                 colors: isDark
-                    ? [
-                        Colors.black.withOpacity(0.6),
-                        Colors.grey.shade800.withOpacity(0.4),
-                      ]
+                    ? [Colors.black87, Colors.black54]
                     : [
-                        kPrimaryOrange.withOpacity(0.65),
-                        const Color.fromARGB(
-                          255,
-                          255,
-                          215,
-                          173,
-                        ).withOpacity(0.35),
+                        kPrimaryOrange.withOpacity(0.7),
+                        Colors.orange.shade200.withOpacity(0.4)
                       ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -543,62 +746,69 @@ class _DeveloperPropertiesState extends State<DeveloperProperties> {
             child: isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : developer == null
-                ? const Center(child: Text("Developer not found"))
-                : Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: ListView(
-                      children: [
-                        const SizedBox(height: 10),
-
-                        /// ------------------- TOP BAR -------------------
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    ? const Center(child: Text("Developer not found"))
+                    : Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: ListView(
                           children: [
-                            _glassBackButton(isDark, context),
+                            const SizedBox(height: 10),
+
+                            /// ------------------- TOP BAR -------------------
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                _glassBackButton(glass),
+                                Text(
+                                  developer!['developer_name'] ?? '',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: glass.textPrimary,
+                                  ),
+                                ),
+                                const SizedBox(width: 40),
+                              ],
+                            ),
+
+                            const SizedBox(height: 18),
+
+                            /// ------------------- DEVELOPER HEADER -------------------
+                            _buildDeveloperHeader(glass),
+
+                            const SizedBox(height: 26),
+
                             Text(
-                              developer!['developer_name'] ?? '',
+                              "Properties by ${developer!['developer_name']}",
                               style: TextStyle(
                                 fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: isDark ? Colors.white : Colors.black87,
+                                fontWeight: FontWeight.w700,
+                                color: glass.textPrimary,
                               ),
                             ),
-                            const SizedBox(width: 40),
+
+                            const SizedBox(height: 14),
+
+                            /// ------------------- PROPERTY LIST -------------------
+                            ...properties.map(
+                              (p) => HomePropertyCard(
+                                property: p,
+                                isDark: isDark,
+                                onTap: () {
+                                  // Optional: navigate to property detail page
+                                },
+                              ),
+                            ),
                           ],
                         ),
-
-                        const SizedBox(height: 20),
-
-                        /// ------------------- DEVELOPER CARD -------------------
-                        _buildDeveloperHeader(isDark),
-
-                        const SizedBox(height: 26),
-
-                        Text(
-                          "Properties by ${developer!['developer_name']}",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: isDark ? Colors.white : Colors.black87,
-                          ),
-                        ),
-
-                        const SizedBox(height: 14),
-
-                        ...properties
-                            .map((p) => _buildGlassPropertyCard(p, isDark))
-                            .toList(),
-                      ],
-                    ),
-                  ),
+                      ),
           ),
         ],
       ),
     );
   }
 
-  /// ------------------- BACK BUTTON GLASS -------------------
-  Widget _glassBackButton(bool isDark, BuildContext context) {
+  /// ------------------- BACK BUTTON -------------------
+  Widget _glassBackButton(GlassColors glass) {
     return GestureDetector(
       onTap: () => Navigator.pop(context),
       child: ClipRRect(
@@ -609,209 +819,115 @@ class _DeveloperPropertiesState extends State<DeveloperProperties> {
             height: 40,
             width: 40,
             decoration: BoxDecoration(
-              color: isDark
-                  ? Colors.white.withOpacity(0.08)
-                  : Colors.white.withOpacity(0.6),
+              color: glass.cardBackground,
               shape: BoxShape.circle,
-              border: Border.all(
-                color: isDark ? Colors.white30 : Colors.orange.shade300,
-              ),
+              border: Border.all(color: glass.glassBorder),
             ),
-            child: Icon(
-              Icons.arrow_back_rounded,
-              color: isDark ? Colors.white : kPrimaryOrange,
-            ),
+            child: Icon(Icons.arrow_back_rounded, color: glass.textPrimary),
           ),
         ),
       ),
     );
   }
 
-  /// ------------------- GLASS DEVELOPER HEADER -------------------
-  Widget _buildDeveloperHeader(bool isDark) {
+  /// ------------------- DEVELOPER HEADER CARD -------------------
+  Widget _buildDeveloperHeader(GlassColors glass) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(22),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: isDark
-                ? Colors.white.withOpacity(0.1)
-                : Colors.white.withOpacity(0.6),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: isDark ? Colors.white24 : Colors.orange.shade200,
-            ),
+            color: glass.cardBackground,
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: glass.glassBorder),
           ),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(14),
-                child: Image.network(
-                  developer!['developer_logo'] ?? '',
-                  height: 80,
-                  width: 95,
-                  fit: BoxFit.cover,
+              Container(
+                height: 120,
+                width: 140,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: glass.glassBorder),
+                  color: glass.cardBackground,
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    alignment: Alignment.center,
+                    child: Image.network(
+                      developer!['developer_logo'] ?? '',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 ),
               ),
-              const SizedBox(width: 16),
+
+              const SizedBox(width: 14),
+
+              /// DETAILS
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    /// Developer Name — larger, cleaner
                     Text(
-                      developer!['developer_name'],
+                      developer!['developer_name'] ?? '',
                       style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Colors.black87,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                        color: glass.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 6),
+
+                    const SizedBox(height: 8),
+
+                    /// City Row — neat + spacing
                     Row(
                       children: [
-                        Icon(
-                          Icons.location_on,
-                          size: 16,
-                          color: kPrimaryOrange,
-                        ),
+                        Icon(Icons.location_on,
+                            size: 16, color: kPrimaryOrange),
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
                             developer!['developer_city'] ?? '',
                             style: TextStyle(
-                              color: isDark ? Colors.white70 : Colors.black54,
+                              fontSize: 13,
+                              color: glass.textSecondary,
                             ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      "📞 ${developer!['developer_mobile_number']}",
-                      style: TextStyle(
-                        color: isDark ? Colors.white70 : Colors.black87,
+
+                    const SizedBox(height: 10),
+
+                    /// Phone — subtle container (same color palette)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: glass.glassBorder),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// ------------------- GLASS PROPERTY CARD -------------------
-  Widget _buildGlassPropertyCard(Map<String, dynamic> property, bool isDark) {
-    final imageUrl =
-        property['property_images'] != null &&
-            property['property_images'].isNotEmpty
-        ? property['property_images'][0]
-        : 'https://via.placeholder.com/400x200';
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(18),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 18),
-          decoration: BoxDecoration(
-            color: isDark
-                ? Colors.white.withOpacity(0.1)
-                : Colors.white.withOpacity(0.6),
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(
-              color: isDark ? Colors.white24 : Colors.orange.shade200,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: isDark
-                    ? Colors.black54
-                    : Colors.orange.withOpacity(0.25),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              /// IMAGE
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(18),
-                ),
-                child: Image.network(
-                  imageUrl,
-                  height: 170,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-              ),
-
-              /// DETAILS
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 12,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      property['property_name'] ?? 'No Title',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.location_on,
-                          size: 14,
-                          color: kPrimaryOrange,
-                        ),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            property['property_city'] ?? '',
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.phone, size: 14, color: kPrimaryOrange),
+                          const SizedBox(width: 6),
+                          Text(
+                            developer!['developer_mobile_number'] ?? '',
                             style: TextStyle(
-                              fontSize: 12,
-                              color: isDark ? Colors.white70 : Colors.black54,
+                              fontSize: 13,
+                              color: glass.textPrimary,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Icon(Icons.villa, size: 12, color: kPrimaryOrange),
-                        const SizedBox(width: 4),
-                        Text(
-                          property['property_type'] ?? '',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: isDark ? Colors.white70 : Colors.black54,
-                          ),
-                        ),
-                        const SizedBox(width: 14),
-                        Icon(Icons.category, size: 12, color: kPrimaryOrange),
-                        const SizedBox(width: 4),
-                        Text(
-                          property['property_category'] ?? '',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: isDark ? Colors.white70 : Colors.black54,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ),

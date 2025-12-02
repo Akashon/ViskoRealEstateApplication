@@ -222,6 +222,8 @@ class _HomePropertyCardState extends State<HomePropertyCard> {
                               builder: (_) => InquiryForm(
                                 isDark: widget.isDark,
                                 propertySlug: property['slug'] ?? "",
+                                propertyName: null,
+                                propertyData: null,
                               ),
                             );
                           },
@@ -289,5 +291,3 @@ class _HomePropertyCardState extends State<HomePropertyCard> {
     );
   }
 }
-
-// this is perfect my glass theme card and you collect this color code and replace my lib/theme/app_theme.dart code and give me full code and i give my theme/app_theme.dart code this is

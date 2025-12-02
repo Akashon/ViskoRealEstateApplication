@@ -221,6 +221,8 @@ class InquiryForm extends StatefulWidget {
     super.key,
     required this.isDark,
     required this.propertySlug,
+    required propertyName,
+    required propertyData,
   });
 
   @override

@@ -979,7 +979,7 @@ import 'package:visko_rocky_flutter/theme/app_theme.dart';
 
 class PropertyDetailPage extends StatefulWidget {
   final String slug;
-  const PropertyDetailPage({required this.slug, super.key});
+  const PropertyDetailPage({required this.slug, super.key, required property});
 
   @override
   _PropertyDetailPageState createState() => _PropertyDetailPageState();
@@ -1545,6 +1545,8 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                           builder: (_) => InquiryForm(
                                             isDark: isDark,
                                             propertySlug: widget.slug,
+                                            propertyName: null,
+                                            propertyData: null,
                                           ),
                                         );
                                       },

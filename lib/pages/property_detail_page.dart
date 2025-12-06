@@ -963,8 +963,6 @@
 //   }
 // }
 
-// // remove this custom color and style and add init my lib/theme/app_theme.dart color and style with light and dark glass theme and this is my lib/theme/app_theme.dart code
-
 // property_detail_page.dart
 import 'dart:convert';
 import 'dart:ui';
@@ -1065,7 +1063,7 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                           Stack(
                             children: [
                               SizedBox(
-                                height: 380,
+                                height: 480,
                                 child: GestureDetector(
                                   onTap: () => openFullScreenImage(
                                       _getImageAtIndex(activeIndex)),
@@ -1152,13 +1150,6 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                 right: 16,
                                 child: Row(
                                   children: [
-                                    // glassCircle(
-                                    //   child: IconButton(
-                                    //     icon: Icon(Icons.share,
-                                    //         color: glassColors.textPrimary),
-                                    //     onPressed: () {},
-                                    //   ),
-                                    // ),
                                     glassCircle(
                                       child: IconButton(
                                         icon: Icon(Icons.share,
@@ -1176,7 +1167,6 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                         },
                                       ),
                                     ),
-
                                     const SizedBox(width: 8),
                                     glassCircle(
                                       child: IconButton(
@@ -1625,26 +1615,6 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
     );
   }
 
-  // Widget glassButton({required IconData icon}) {
-  //   final glass = Theme.of(Get.context!).extension<GlassColors>()!;
-  //   return ClipRRect(
-  //     borderRadius: BorderRadius.circular(50),
-  //     child: BackdropFilter(
-  //       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-  //       child: Container(
-  //         height: 40,
-  //         width: 40,
-  //         decoration: BoxDecoration(
-  //           color: glass.glassBackground,
-  //           shape: BoxShape.circle,
-  //           border: Border.all(color: glass.glassBorder),
-  //         ),
-  //         child:
-  //             Icon(icon, color: Theme.of(Get.context!).primaryColor, size: 20),
-  //       ),
-  //     ),
-  //   );
-  // }
   Widget glassButton({
     required IconData icon,
     VoidCallback? onTap,

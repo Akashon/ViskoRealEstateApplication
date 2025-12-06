@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:visko_rocky_flutter/component/home_property_card.dart';
-import 'package:visko_rocky_flutter/component/inquiry_form.dart'
-    hide kPrimaryOrange;
+import 'package:visko_rocky_flutter/component/inquiry_form.dart';
+import 'package:visko_rocky_flutter/pages/property_detail_page.dart';
 import '../controller/theme_controller.dart';
 import 'package:visko_rocky_flutter/theme/app_theme.dart';
 
@@ -132,7 +132,10 @@ class _DeveloperPropertiesState extends State<DeveloperProperties> {
                                 property: p,
                                 isDark: isDark,
                                 onTap: () {
-                                  // Optional: navigate to property detail page
+                                  Get.to(() => PropertyDetailPage(
+                                        slug: p['property_slug'],
+                                        property: null,
+                                      ));
                                 },
                               ),
                             ),

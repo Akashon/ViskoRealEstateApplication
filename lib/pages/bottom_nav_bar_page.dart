@@ -151,10 +151,7 @@
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:get/get.dart';
-import 'package:visko_rocky_flutter/component/home_property_card.dart';
-import 'package:visko_rocky_flutter/component/inquiry_form.dart'
-    hide kPrimaryOrange;
-
+import 'package:visko_rocky_flutter/component/inquiry_form.dart';
 import 'package:visko_rocky_flutter/pages/categories_page.dart';
 import 'package:visko_rocky_flutter/pages/home.dart';
 import 'package:visko_rocky_flutter/pages/favorite_page.dart';
@@ -162,7 +159,6 @@ import 'package:visko_rocky_flutter/pages/location_page.dart';
 import '../controller/theme_controller.dart';
 import 'package:visko_rocky_flutter/theme/app_theme.dart';
 import 'account_setting_page.dart';
-import 'package:visko_rocky_flutter/config/colors.dart' hide kPrimaryOrange;
 
 class BottomNavBarPage extends StatefulWidget {
   @override

@@ -34,6 +34,7 @@ dependencies:
   get: ^4.6.6
   share_plus: ^10.0.0
   curved_navigation_bar: ^1.0.6
+  shimmer: ^3.0.0
 
   carousel_slider: ^4.2.1
   cached_network_image: ^3.3.1

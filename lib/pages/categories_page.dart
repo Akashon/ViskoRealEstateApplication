@@ -1,3 +1,5 @@
+// THIS IS MY categories_page.dart page code
+
 import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';

@@ -92,8 +92,8 @@ class DeveloperCard extends StatelessWidget {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.black.withOpacity(0.2),
-                      Colors.black.withOpacity(0.35),
+                      Colors.black.withOpacity(0.1),
+                      Colors.black.withOpacity(0.10),
                     ],
                   ),
                 ),

@@ -1277,6 +1277,74 @@ class _HomePageState extends State<HomePage> {
     fetchFilters(subc: subcategory.value);
   }
 
+  // Future<void> fetchFilters({
+  //   String subc = "Residential",
+  //   String location = "",
+  //   String type = "",
+  //   String sqFt = "",
+  // }) async {
+  //   try {
+  //     final url =
+  //         'https://apimanager.viskorealestate.com/fetch-homepage-filters?subcategory=$subc&location=$location&type=$type&sq_ft=$sqFt';
+  //     final response = await http.get(Uri.parse(url));
+  //     final data = jsonDecode(response.body);
+
+  //     if (data['status'] == true) {
+  //       // If no location passed, populate locations list
+  //       if (location.isEmpty) {
+  //         locations.value = List<String>.from(data['locations'] ?? []);
+  //       }
+
+  //       // If location passed but type not passed, populate types
+  //       if (location.isNotEmpty && type.isEmpty) {
+  //         types.value = List<String>.from(data['types'] ?? []);
+  //       }
+
+  //       // If location + type (or plot) -> populate sqFts
+  //       if (location.isNotEmpty && (type.isNotEmpty || subc == "Plot")) {
+  //         // API returns sqFts as map sometimes; take values or list
+  //         final sqData = data['sqFts'];
+  //         if (sqData is Map) {
+  //           sqFts.value =
+  //               List<String>.from(sqData.values.map((e) => e.toString()));
+  //         } else if (sqData is List) {
+  //           sqFts.value = List<String>.from(sqData.map((e) => e.toString()));
+  //         } else {
+  //           sqFts.value = [];
+  //         }
+  //       }
+
+  //       // If user switched subcategory, ensure dependent lists cleared if needed
+  //       if (location.isEmpty &&
+  //           type.isEmpty &&
+  //           sqFt.isEmpty &&
+  //           subc.isNotEmpty) {
+  //         // when just loading for subcategory change
+  //         types.clear();
+  //         sqFts.clear();
+  //       }
+  //     } else {
+  //       // status false -> clear dependent lists
+  //       if (location.isEmpty) {
+  //         locations.clear();
+  //       } else if (location.isNotEmpty && type.isEmpty) {
+  //         types.clear();
+  //       } else {
+  //         sqFts.clear();
+  //       }
+  //     }
+  //   } catch (e) {
+  //     // On error, clear dependent lists to avoid stale options
+  //     if (location.isEmpty) {
+  //       locations.clear();
+  //     } else if (location.isNotEmpty && type.isEmpty) {
+  //       types.clear();
+  //     } else {
+  //       sqFts.clear();
+  //     }
+  //   }
+  // }
+
   Future<void> fetchFilters({
     String subc = "Residential",
     String location = "",
@@ -1284,25 +1352,33 @@ class _HomePageState extends State<HomePage> {
     String sqFt = "",
   }) async {
     try {
+      // ⭐ CHANGED → API expects Residential + type=plot for Plot tab
+      final apiSubc = subc == "Plot" ? "Residential" : subc;
+      final apiType = subc == "Plot" ? "plot" : type;
+
       final url =
-          'https://apimanager.viskorealestate.com/fetch-homepage-filters?subcategory=$subc&location=$location&type=$type&sq_ft=$sqFt';
+          'https://apimanager.viskorealestate.com/fetch-homepage-filters'
+          '?subcategory=$apiSubc'
+          '&location=$location'
+          '&type=$apiType'
+          '&sq_ft=$sqFt';
+
       final response = await http.get(Uri.parse(url));
       final data = jsonDecode(response.body);
 
       if (data['status'] == true) {
-        // If no location passed, populate locations list
+        /// ⭐ CHANGED → Always load locations when empty
         if (location.isEmpty) {
           locations.value = List<String>.from(data['locations'] ?? []);
         }
 
-        // If location passed but type not passed, populate types
-        if (location.isNotEmpty && type.isEmpty) {
+        /// Residential → types
+        if (subc == "Residential" && location.isNotEmpty && type.isEmpty) {
           types.value = List<String>.from(data['types'] ?? []);
         }
 
-        // If location + type (or plot) -> populate sqFts
-        if (location.isNotEmpty && (type.isNotEmpty || subc == "Plot")) {
-          // API returns sqFts as map sometimes; take values or list
+        /// Plot OR Residential → sqFt
+        if (location.isNotEmpty && (subc == "Plot" || type.isNotEmpty)) {
           final sqData = data['sqFts'];
           if (sqData is Map) {
             sqFts.value =
@@ -1310,38 +1386,18 @@ class _HomePageState extends State<HomePage> {
           } else if (sqData is List) {
             sqFts.value = List<String>.from(sqData.map((e) => e.toString()));
           } else {
-            sqFts.value = [];
+            sqFts.clear();
           }
         }
-
-        // If user switched subcategory, ensure dependent lists cleared if needed
-        if (location.isEmpty &&
-            type.isEmpty &&
-            sqFt.isEmpty &&
-            subc.isNotEmpty) {
-          // when just loading for subcategory change
-          types.clear();
-          sqFts.clear();
-        }
       } else {
-        // status false -> clear dependent lists
-        if (location.isEmpty) {
-          locations.clear();
-        } else if (location.isNotEmpty && type.isEmpty) {
-          types.clear();
-        } else {
-          sqFts.clear();
-        }
-      }
-    } catch (e) {
-      // On error, clear dependent lists to avoid stale options
-      if (location.isEmpty) {
         locations.clear();
-      } else if (location.isNotEmpty && type.isEmpty) {
         types.clear();
-      } else {
         sqFts.clear();
       }
+    } catch (e) {
+      locations.clear();
+      types.clear();
+      sqFts.clear();
     }
   }
 
@@ -1533,11 +1589,22 @@ class _HomePageState extends State<HomePage> {
                           /// -------------------------------
                           /// PREMIUM GLASS TAB SWITCHER
                           /// -------------------------------
+
                           Row(
                             children: ["Residential", "Plot"].map((tab) {
                               final active = subcategory.value == tab;
 
                               return GestureDetector(
+                                // onTap: () {
+                                //   subcategory.value = tab;
+                                //   selectedLocation.value = "";
+                                //   selectedType.value = "";
+                                //   selectedSqFt.value = "";
+                                //   locations.clear();
+                                //   types.clear();
+                                //   sqFts.clear();
+                                //   fetchFilters(subc: tab);
+                                // },
                                 onTap: () {
                                   subcategory.value = tab;
                                   selectedLocation.value = "";
@@ -1546,8 +1613,11 @@ class _HomePageState extends State<HomePage> {
                                   locations.clear();
                                   types.clear();
                                   sqFts.clear();
+
+                                  // ⭐ CHANGED
                                   fetchFilters(subc: tab);
                                 },
+
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 220),
                                   padding: const EdgeInsets.symmetric(
@@ -1574,7 +1644,7 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                     border: Border.all(
                                       color: glass.glassBorder
-                                          .withOpacity(active ? 0.9 : 0.6),
+                                          .withOpacity(active ? 0.9 : 0.3),
                                       width: 1.3,
                                     ),
                                     boxShadow: [
@@ -1610,7 +1680,7 @@ class _HomePageState extends State<HomePage> {
                                   bottomLeft: Radius.circular(20),
                                   bottomRight: Radius.circular(20)),
                               border: Border.all(
-                                color: glass.glassBorder.withOpacity(0.8),
+                                color: glass.glassBorder,
                                 width: 1.2,
                               ),
                               boxShadow: [
@@ -1623,11 +1693,28 @@ class _HomePageState extends State<HomePage> {
                             ),
                             child: Column(
                               children: [
-                                /// ---------------- 1ST ROW ----------------
                                 //  make location size width big and type is size is small
+                                /// ---------------- 1ST ROW ----------------
                                 Row(
                                   children: [
+                                    /// PLOT → RESIDENTIAL (STATIC)
+                                    if (subcategory.value == "Plot")
+                                      Expanded(
+                                        flex: 2,
+                                        child: buildRoundedDropdown(
+                                          label: "Residential",
+                                          items: const ["Residential"],
+                                          value: "Residential",
+                                          onChanged: (_) {},
+                                        ),
+                                      ),
+
+                                    if (subcategory.value == "Plot")
+                                      const SizedBox(width: 6),
+
+                                    /// LOCATION (Both tabs)
                                     Expanded(
+                                      flex: 3,
                                       child: buildRoundedDropdown(
                                         label: "Location",
                                         items: locations,
@@ -1647,7 +1734,6 @@ class _HomePageState extends State<HomePage> {
                                         },
                                       ),
                                     ),
-                                    const SizedBox(width: 4),
                                   ],
                                 ),
 
@@ -1656,8 +1742,10 @@ class _HomePageState extends State<HomePage> {
                                 /// ---------------- 2ND ROW ----------------
                                 Row(
                                   children: [
+                                    /// TYPE (Residential only)
                                     if (subcategory.value == "Residential")
                                       Expanded(
+                                        flex: 2,
                                         child: buildRoundedDropdown(
                                           label: "Type",
                                           items: types,
@@ -1678,27 +1766,29 @@ class _HomePageState extends State<HomePage> {
                                           },
                                         ),
                                       ),
-                                    const SizedBox(width: 4),
 
+                                    if (subcategory.value == "Residential")
+                                      const SizedBox(width: 6),
+
+                                    /// AREA SIZE (Both tabs)
                                     SizedBox(
-                                      width: 120,
-                                      child: Expanded(
-                                        child: buildRoundedDropdown(
-                                          label: "Area Size (sq. ft.)",
-                                          items: sqFts,
-                                          value: selectedSqFt.value.isEmpty
-                                              ? null
-                                              : selectedSqFt.value,
-                                          onChanged: (val) {
-                                            if (val != null)
-                                              selectedSqFt.value = val;
-                                          },
-                                        ),
+                                      width: 140,
+                                      child: buildRoundedDropdown(
+                                        label: "Area Size (sq. ft.)",
+                                        items: sqFts,
+                                        value: selectedSqFt.value.isEmpty
+                                            ? null
+                                            : selectedSqFt.value,
+                                        onChanged: (val) {
+                                          if (val != null)
+                                            selectedSqFt.value = val;
+                                        },
                                       ),
                                     ),
-                                    const SizedBox(width: 4),
 
-                                    /// PREMIUM SEARCH BUTTON
+                                    const SizedBox(width: 6),
+
+                                    /// SEARCH BUTTON
                                     SizedBox(
                                       height: 50,
                                       child: ElevatedButton(
@@ -1711,11 +1801,7 @@ class _HomePageState extends State<HomePage> {
                                             borderRadius:
                                                 BorderRadius.circular(16),
                                           ),
-                                          // padding: const EdgeInsets.symmetric(
-                                          //     horizontal: 34),
                                           elevation: 6,
-                                          shadowColor:
-                                              Colors.black.withOpacity(0.25),
                                         ),
                                         child: Obx(() {
                                           if (isLoadingSearch.value) {
@@ -1723,17 +1809,11 @@ class _HomePageState extends State<HomePage> {
                                               width: 20,
                                               height: 20,
                                               child: CircularProgressIndicator(
-                                                color: Colors.white,
-                                              ),
+                                                  color: Colors.white),
                                             );
                                           }
-                                          return Row(
-                                            children: const [
-                                              Icon(Icons.search,
-                                                  color: Colors.white),
-                                              // SizedBox(width: 8),
-                                            ],
-                                          );
+                                          return const Icon(Icons.search,
+                                              color: Colors.white);
                                         }),
                                       ),
                                     ),
@@ -1862,25 +1942,14 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
 
-                    const SizedBox(height: 20),
-
-                    /// Popular Properties Title
-                    Text(
-                      "Popular Properties",
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: glass.textPrimary),
-                    ),
-
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 24),
 
                     // -------------------------------------------------
                     // In-page SEARCH RESULTS: If searchResults has items, show them.
                     // Otherwise show Location Chips + Popular list as before.
                     // -------------------------------------------------
+
                     Obx(() {
-                      // while searching show progress
                       if (isSearching.value) {
                         return const Padding(
                           padding: EdgeInsets.symmetric(vertical: 30),
@@ -1888,45 +1957,23 @@ class _HomePageState extends State<HomePage> {
                         );
                       }
 
-                      // If searchResults contains items, show header + list
-                      if (searchResults.isNotEmpty) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Search Results (${searchResults.length})",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: glass.textPrimary),
-                            ),
-                            const SizedBox(height: 12),
-                            Column(
-                              children: searchResults.map((property) {
-                                return HomePropertyCard(
-                                  property: property,
-                                  isDark: isDark,
-                                  onTap: () {
-                                    Get.to(() => PropertyDetailPage(
-                                          slug: property['property_slug'] ?? "",
-                                          property: property,
-                                        ));
-                                  },
-                                );
-                              }).toList(),
-                            ),
-                            const SizedBox(height: 20),
-                          ],
-                        );
-                      }
-
-                      // If no search results and not searching -> show location chips + popular properties
                       final allLocations = controller.properties
                           .map((e) => e['property_location_name'] ?? 'Unknown')
                           .toSet()
                           .toList();
 
+                      // Filter properties based on selected chip
+                      final filteredProperties = selectedLocation.value.isEmpty
+                          ? controller.properties
+                          : controller.properties
+                              .where((p) =>
+                                  (p['property_location_name'] ?? '')
+                                      .toLowerCase() ==
+                                  selectedLocation.value.toLowerCase())
+                              .toList();
+
                       return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           /// Location Chips
                           SizedBox(
@@ -1941,20 +1988,18 @@ class _HomePageState extends State<HomePage> {
                                     loc,
                                     selected: selectedLocation.value == loc,
                                     onTap: () {
-                                      selectedLocation.value = loc;
-                                      // optionally filter the popular list in-place:
-                                      // (here we set searchResults from controller.properties filtered by loc)
-                                      final filtered = controller.properties
-                                          .where((p) =>
-                                              (p['property_location_name'] ??
-                                                      '')
-                                                  .toString()
-                                                  .toLowerCase() ==
-                                              loc.toLowerCase())
-                                          .toList();
+                                      // Toggle selection
+                                      if (selectedLocation.value == loc) {
+                                        selectedLocation.value = '';
+                                      } else {
+                                        selectedLocation.value = loc;
+                                      }
+
+                                      // Update search results
                                       searchResults.clear();
-                                      searchResults.addAll(filtered.map(
-                                          (e) => Map<String, dynamic>.from(e)));
+                                      searchResults.addAll(
+                                          filteredProperties.map((e) =>
+                                              Map<String, dynamic>.from(e)));
                                     },
                                   ),
                                 );
@@ -1962,33 +2007,48 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
 
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 12),
 
-                          /// Popular Property List
-                          Obx(
-                            () => controller.isLoading.value
-                                ? const Center(
-                                    child: CircularProgressIndicator())
-                                : Column(
-                                    children:
-                                        controller.properties.map((property) {
-                                      return HomePropertyCard(
-                                        property: property,
-                                        isDark: isDark,
-                                        onTap: () {
-                                          Get.to(() => PropertyDetailPage(
-                                                slug: property['property_slug'],
-                                                property: null,
-                                              ));
-                                        },
-                                      );
-                                    }).toList(),
-                                  ),
+                          /// Popular Properties Title
+                          Text(
+                            "Popular Properties",
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: glass.textPrimary),
                           ),
+
+                          const SizedBox(height: 12),
+                          Text(
+                            "Search Results (${searchResults.length})",
+                            style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: glass.textPrimary),
+                          ),
+                          const SizedBox(height: 6),
+
+                          // Show results
+                          filteredProperties.isEmpty
+                              ? const Center(child: Text("No properties found"))
+                              : Column(
+                                  children: filteredProperties.map((property) {
+                                    return HomePropertyCard(
+                                      property: property,
+                                      isDark: isDark,
+                                      onTap: () {
+                                        Get.to(() => PropertyDetailPage(
+                                              slug: property['property_slug'] ??
+                                                  "",
+                                              property: property,
+                                            ));
+                                      },
+                                    );
+                                  }).toList(),
+                                ),
                         ],
                       );
                     }),
-
                     const SizedBox(height: 40),
                   ],
                 ),

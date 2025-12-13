@@ -205,6 +205,8 @@ class _LocationPageState extends State<LocationPage>
                           final slug = filteredLocations[index]
                                   ["property_location_slug"] ??
                               "";
+                          final count =
+                              filteredLocations[index]["property_count"] ?? 0;
 
                           return ScaleTransition(
                             scale: CurvedAnimation(
@@ -282,6 +284,14 @@ class _LocationPageState extends State<LocationPage>
                                             color: glass.textPrimary,
                                             fontSize: 16,
                                             fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        Text(
+                                          "$count Properties",
+                                          style: TextStyle(
+                                            color: glass.textSecondary,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500,
                                           ),
                                         ),
                                       ],

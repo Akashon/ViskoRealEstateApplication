@@ -156,6 +156,7 @@ import 'package:visko_rocky_flutter/pages/categories_page.dart';
 import 'package:visko_rocky_flutter/pages/home.dart';
 import 'package:visko_rocky_flutter/pages/favorite_page.dart';
 import 'package:visko_rocky_flutter/pages/location_page.dart';
+import 'package:visko_rocky_flutter/pages/testing.dart';
 import '../controller/theme_controller.dart';
 import 'package:visko_rocky_flutter/theme/app_theme.dart';
 import 'account_setting_page.dart';
@@ -176,6 +177,7 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
     LocationPage(),
     FavoritePage(),
     SettingsPage(),
+    // Testing(),
   ];
 
   @override
@@ -247,6 +249,11 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
                 active: Icons.settings_rounded,
                 inactive: Icons.settings_outlined,
               ),
+              // _buildIcon(
+              //   selected: _pageIndex == 5,
+              //   active: Icons.developer_mode,
+              //   inactive: Icons.developer_mode_outlined,
+              // ),
             ],
 
             onTap: (index) {

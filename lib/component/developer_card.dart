@@ -165,8 +165,8 @@ class DeveloperCard extends StatelessWidget {
                               const SizedBox(height: 4),
                               Row(
                                 children: [
-                                  const Icon(Icons.location_on,
-                                      size: 14, color: Colors.white70),
+                                  Icon(Icons.location_on,
+                                      size: 14, color: glass.textSecondary),
                                   const SizedBox(width: 4),
                                   Expanded(
                                     child: Text(

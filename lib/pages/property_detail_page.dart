@@ -963,7 +963,7 @@
 //   }
 // }
 
-// property_detail_page.dart
+// this is my  property_detail_page.dart
 import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
@@ -974,6 +974,9 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:visko_rocky_flutter/component/inquiry_form.dart';
 import 'package:visko_rocky_flutter/controller/theme_controller.dart';
 import 'package:visko_rocky_flutter/theme/app_theme.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'package:open_filex/open_filex.dart';
 
 class PropertyDetailPage extends StatefulWidget {
   final String slug;
@@ -981,6 +984,37 @@ class PropertyDetailPage extends StatefulWidget {
 
   @override
   _PropertyDetailPageState createState() => _PropertyDetailPageState();
+}
+
+Future<void> downloadAndOpenPDF(String url) async {
+  try {
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      final bytes = response.bodyBytes;
+
+      final dir = await getApplicationDocumentsDirectory();
+      final file = File('${dir.path}/property_brochure.pdf');
+
+      await file.writeAsBytes(bytes, flush: true);
+
+      // Open the PDF
+      await OpenFilex.open(file.path);
+    } else {
+      Get.snackbar(
+        "Download Failed",
+        "Could not download brochure",
+        // backgroundColor: Theme.of(context).primaryColor.withOpacity(0.9),
+        colorText: Colors.white,
+      );
+    }
+  } catch (e) {
+    Get.snackbar(
+      "Error",
+      "Something went wrong: $e",
+      // backgroundColor: Theme.of(context).primaryColor.withOpacity(0.9),
+      colorText: Colors.white,
+    );
+  }
 }
 
 class _PropertyDetailPageState extends State<PropertyDetailPage>
@@ -1135,45 +1169,38 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                               Positioned(
                                 top: 40,
                                 left: 14,
-                                child: glassCircle(
-                                  child: IconButton(
-                                    icon: Icon(
-                                      Icons.arrow_back_ios,
-                                      color: glassColors.textPrimary,
-                                    ),
-                                    onPressed: () => Navigator.pop(context),
-                                  ),
+                                child: _glassCircleIcon(
+                                  icon: Icons.arrow_back_ios_new,
+                                  tooltip: 'Back',
+                                  onTap: () => Navigator.pop(context),
                                 ),
                               ),
+
                               Positioned(
                                 top: 40,
                                 right: 16,
                                 child: Row(
                                   children: [
-                                    glassCircle(
-                                      child: IconButton(
-                                        icon: Icon(Icons.share,
-                                            color: glassColors.textPrimary),
-                                        onPressed: () {
-                                          final title =
-                                              property?['title'] ?? 'Property';
-                                          final link = property?['url'] ??
-                                              'https://visko-realestate.com';
+                                    _glassCircleIcon(
+                                      icon: Icons.share,
+                                      tooltip: 'Share',
+                                      onTap: () {
+                                        final title =
+                                            property?['title'] ?? 'Property';
+                                        final link = property?['url'] ??
+                                            'https://visko-realestate.com';
 
-                                          Share.share(
-                                            'Check this property: $title\n\n$link',
-                                            subject: 'VISKO Property Share',
-                                          );
-                                        },
-                                      ),
+                                        Share.share(
+                                          'Check this property: $title\n\n$link',
+                                          subject: 'VISKO Property Share',
+                                        );
+                                      },
                                     ),
-                                    const SizedBox(width: 8),
-                                    glassCircle(
-                                      child: IconButton(
-                                        icon: Icon(Icons.favorite_border,
-                                            color: glassColors.textPrimary),
-                                        onPressed: () {},
-                                      ),
+                                    const SizedBox(width: 10),
+                                    _glassCircleIcon(
+                                      icon: Icons.favorite_border,
+                                      tooltip: 'Wishlist',
+                                      onTap: () {},
                                     ),
                                   ],
                                 ),
@@ -1324,7 +1351,7 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                 tabs: const [
                                   Tab(text: 'About'),
                                   Tab(text: 'Gallery'),
-                                  Tab(text: 'Review'),
+                                  Tab(text: 'View Map'),
                                 ],
                               ),
                             ),
@@ -1407,7 +1434,7 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                 // REVIEW
                                 Center(
                                   child: Text(
-                                    "No reviews available.",
+                                    "No Map available.",
                                     style: TextStyle(
                                         color: glassColors.textSecondary),
                                   ),
@@ -1496,6 +1523,342 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                               spacing: 8,
                               runSpacing: 8,
                               children: _amenityChips(),
+                            ),
+                          ),
+
+                          // FLOOR PLAN SECTION
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Heading
+                                Text(
+                                  "Floor Plans",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: glassColors
+                                        .textPrimary, // uses your theme
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+
+                                // List of floor plans
+                                Column(
+                                  children: (property?['property_floor_plan']
+                                              as List<dynamic>? ??
+                                          [])
+                                      .asMap()
+                                      .entries
+                                      .map((entry) {
+                                    final index = entry.key;
+                                    final url = entry.value.toString();
+                                    return Card(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12)),
+                                      color: glassColors
+                                          .chipUnselectedStart, // theme color
+
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 3),
+                                      elevation: 2,
+                                      child: ExpansionTile(
+                                        iconColor: Theme.of(context)
+                                            .primaryColor, // arrow color
+                                        collapsedIconColor:
+                                            Theme.of(context).primaryColor,
+                                        title: Text(
+                                          "Map ${index + 1}",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                            color: glassColors
+                                                .textPrimary, // theme color
+                                          ),
+                                        ),
+                                        childrenPadding:
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 12, vertical: 2),
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (_) =>
+                                                        FullScreenImageViewer(
+                                                            imageUrl: url)),
+                                              );
+                                            },
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              child: Image.network(
+                                                url,
+                                                width: double.infinity,
+                                                height: 180,
+                                                fit: BoxFit.cover,
+                                                loadingBuilder:
+                                                    (context, child, progress) {
+                                                  if (progress == null)
+                                                    return child;
+                                                  return Container(
+                                                    height: 180,
+                                                    color: glassColors
+                                                        .chipUnselectedStart,
+                                                    child: const Center(
+                                                        child:
+                                                            CircularProgressIndicator()),
+                                                  );
+                                                },
+                                                errorBuilder: (_, __, ___) =>
+                                                    Container(
+                                                  height: 180,
+                                                  color: glassColors
+                                                      .cardBackground,
+                                                  child: const Center(
+                                                      child: Icon(
+                                                          Icons.broken_image)),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // BROCHURE SECTION
+                          // Padding(
+                          //   padding: const EdgeInsets.symmetric(
+                          //       horizontal: 16.0, vertical: 12),
+                          //   child: Column(
+                          //     crossAxisAlignment: CrossAxisAlignment.start,
+                          //     children: [
+                          //       Text(
+                          //         "Brochure",
+                          //         style: TextStyle(
+                          //           fontWeight: FontWeight.bold,
+                          //           fontSize: 16,
+                          //           color: glassColors.textPrimary,
+                          //         ),
+                          //       ),
+                          //       const SizedBox(height: 8),
+
+                          //       // Brochure Card / Button
+                          //       GestureDetector(
+                          //         onTap: () async {
+                          //           final url = property?['property_brochure']
+                          //               ?.toString();
+                          //           if (url == null || url.isEmpty) {
+                          //             Get.snackbar(
+                          //               "No Brochure",
+                          //               "Brochure not available for this property",
+                          //               backgroundColor: Theme.of(context)
+                          //                   .primaryColor
+                          //                   .withOpacity(0.9),
+                          //               colorText: Colors.white,
+                          //             );
+                          //             return;
+                          //           }
+
+                          //           // Download the PDF
+                          //           await downloadAndOpenPDF(url);
+                          //         },
+                          //         child: Card(
+                          //           color: glassColors.cardBackground,
+                          //           shape: RoundedRectangleBorder(
+                          //               borderRadius:
+                          //                   BorderRadius.circular(12)),
+                          //           elevation: 2,
+                          //           child: Padding(
+                          //             padding: const EdgeInsets.symmetric(
+                          //                 horizontal: 16, vertical: 12),
+                          //             child: Row(
+                          //               children: [
+                          //                 Icon(
+                          //                   Icons.picture_as_pdf,
+                          //                   size: 28,
+                          //                   color:
+                          //                       Theme.of(context).primaryColor,
+                          //                 ),
+                          //                 const SizedBox(width: 12),
+                          //                 Expanded(
+                          //                   child: Text(
+                          //                     "Download Brochure",
+                          //                     style: TextStyle(
+                          //                         fontSize: 14,
+                          //                         fontWeight: FontWeight.w600,
+                          //                         color:
+                          //                             glassColors.textPrimary),
+                          //                   ),
+                          //                 ),
+                          //                 Icon(
+                          //                   Icons.download,
+                          //                   color:
+                          //                       Theme.of(context).primaryColor,
+                          //                 )
+                          //               ],
+                          //             ),
+                          //           ),
+                          //         ),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
+
+                          // PREMIUM BROCHURE SECTION
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Brochure",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: glassColors.textPrimary,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+
+                                // Premium Card
+                                GestureDetector(
+                                  onTap: () async {
+                                    final url = property?['property_brochure']
+                                        ?.toString();
+                                    if (url == null || url.isEmpty) {
+                                      Get.snackbar(
+                                        "No Brochure",
+                                        "Brochure not available for this property",
+                                        backgroundColor: Theme.of(context)
+                                            .primaryColor
+                                            .withOpacity(0.9),
+                                        colorText: Colors.white,
+                                      );
+                                      return;
+                                    }
+                                    await downloadAndOpenPDF(url);
+                                  },
+                                  child: StatefulBuilder(
+                                    builder: (context, setState) {
+                                      bool isPressed = false;
+                                      return Listener(
+                                        onPointerDown: (_) =>
+                                            setState(() => isPressed = true),
+                                        onPointerUp: (_) =>
+                                            setState(() => isPressed = false),
+                                        child: AnimatedScale(
+                                          duration:
+                                              const Duration(milliseconds: 150),
+                                          scale: isPressed ? 0.97 : 1.0,
+                                          curve: Curves.easeOutBack,
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            child: BackdropFilter(
+                                              filter: ImageFilter.blur(
+                                                  sigmaX: 15, sigmaY: 15),
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: glassColors
+                                                      .glassBackground
+                                                      .withOpacity(0.85),
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                  border: Border.all(
+                                                      color: glassColors
+                                                          .glassBorder,
+                                                      width: 1.2),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Theme.of(context)
+                                                          .primaryColor
+                                                          .withOpacity(0.15),
+                                                      blurRadius: 20,
+                                                      offset:
+                                                          const Offset(0, 6),
+                                                    )
+                                                  ],
+                                                ),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 20,
+                                                        vertical: 16),
+                                                child: Row(
+                                                  children: [
+                                                    // PDF Icon
+                                                    Container(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              12),
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color: Theme.of(context)
+                                                            .primaryColor
+                                                            .withOpacity(0.15),
+                                                      ),
+                                                      child: Icon(
+                                                        Icons.picture_as_pdf,
+                                                        size: 28,
+                                                        color: Theme.of(context)
+                                                            .primaryColor,
+                                                      ),
+                                                    ),
+
+                                                    const SizedBox(width: 16),
+
+                                                    // Title
+                                                    Expanded(
+                                                      child: Text(
+                                                        "Download Brochure",
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: glassColors
+                                                              .textPrimary,
+                                                        ),
+                                                      ),
+                                                    ),
+
+                                                    // Download arrow
+                                                    Container(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              10),
+                                                      decoration: BoxDecoration(
+                                                        color: Theme.of(context)
+                                                            .primaryColor
+                                                            .withOpacity(0.15),
+                                                        shape: BoxShape.circle,
+                                                      ),
+                                                      child: Icon(
+                                                        Icons.download,
+                                                        color: Theme.of(context)
+                                                            .primaryColor,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
 
@@ -1596,20 +1959,37 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
     }
   }
 
-  Widget glassCircle({required Widget child}) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(40),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
-        child: Container(
-          padding: const EdgeInsets.all(2),
-          decoration: BoxDecoration(
-            color: glassColors.glassBackground,
-            borderRadius: BorderRadius.circular(40),
-            border: Border.all(color: glassColors.glassBorder),
+  Widget _glassCircleIcon({
+    required IconData icon,
+    String? tooltip,
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Tooltip(
+        message: tooltip ?? '',
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(40),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+            child: Container(
+              height: 36,
+              width: 36,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: glassColors.glassBackground,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: glassColors.glassBorder,
+                ),
+              ),
+              child: Icon(
+                icon,
+                size: 18,
+                color: glassColors.textPrimary,
+              ),
+            ),
           ),
-          child: CircleAvatar(
-              radius: 18, backgroundColor: Colors.transparent, child: child),
         ),
       ),
     );
@@ -1805,3 +2185,97 @@ class FullScreenImageViewer extends StatelessWidget {
     );
   }
 }
+
+class FloorPlanPage extends StatefulWidget {
+  final Map<String, dynamic> property;
+  const FloorPlanPage({required this.property, super.key});
+
+  @override
+  _FloorPlanPageState createState() => _FloorPlanPageState();
+}
+
+class _FloorPlanPageState extends State<FloorPlanPage> {
+  int activeIndex = 0;
+  final PageController _pageController = PageController();
+
+  @override
+  Widget build(BuildContext context) {
+    final glassColors = Theme.of(context).extension<GlassColors>()!;
+    final List<dynamic> floorPlans =
+        widget.property['property_floor_plan'] ?? [];
+
+    if (floorPlans.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(title: const Text("Floor Plan")),
+        body: const Center(child: Text("No floor plans available.")),
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        iconTheme: IconThemeData(color: glassColors.textPrimary),
+        elevation: 0,
+        title: const Text("Floor Plan"),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: floorPlans.length,
+              onPageChanged: (index) => setState(() => activeIndex = index),
+              itemBuilder: (context, index) {
+                final img = floorPlans[index].toString();
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => FullScreenImageViewer(imageUrl: img),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    color: glassColors.cardBackground,
+                    child: Image.network(
+                      img,
+                      width: double.infinity,
+                      fit: BoxFit.contain,
+                      loadingBuilder: (context, child, progress) {
+                        if (progress == null) return child;
+                        return const Center(child: CircularProgressIndicator());
+                      },
+                      errorBuilder: (_, __, ___) =>
+                          const Center(child: Icon(Icons.broken_image)),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          // Page indicator
+          if (floorPlans.length > 1)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12.0),
+              child: AnimatedSmoothIndicator(
+                activeIndex: activeIndex,
+                count: floorPlans.length,
+                effect: ExpandingDotsEffect(
+                  activeDotColor: Theme.of(context).primaryColor,
+                  dotColor: glassColors.textSecondary,
+                  dotHeight: 8,
+                  dotWidth: 8,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+
+// and i want to added init 1. (view flow plan) 2. (view on map)  

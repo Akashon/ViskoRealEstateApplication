@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:visko_rocky_flutter/component/inquiry_form.dart';
+// import 'package:visko_rocky_flutter/component/inquiry_form.dart';
 import 'package:visko_rocky_flutter/pages/Property_Location_Page.dart';
 import '../controller/theme_controller.dart';
 import '../theme/app_theme.dart';

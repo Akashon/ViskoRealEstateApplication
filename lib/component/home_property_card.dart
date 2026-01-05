@@ -492,3 +492,4 @@ class _HomePropertyCardState extends State<HomePropertyCard>
     );
   }
 }
+// this is my card design code and i want to show this card horizental design so make this card design horzental screen according and give me full code chnage only ui design and use only my theme accordign color don't add a new init so give me full code

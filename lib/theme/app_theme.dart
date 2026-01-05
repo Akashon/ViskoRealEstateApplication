@@ -1,4 +1,7 @@
 // now this is my theme/app_theme.dart page code and i want to added my bottom_nav_bar_page.dart in it this color code according set color dont' user any custom code
+
+// this is my theme/app_theme.dart page code and i want to added this theme according my home page color don't user my home page init any custom color use only my theme color glass theme light dark so added my home page init my theme color
+
 import 'package:flutter/material.dart';
 import 'package:visko_rocky_flutter/config/colors.dart';
 

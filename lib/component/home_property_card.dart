@@ -4,10 +4,16 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:http/http.dart' as http;
 import 'package:share_plus/share_plus.dart';
 import 'package:visko_rocky_flutter/component/inquiry_form.dart';
+import 'package:visko_rocky_flutter/controller/favorite_controller.dart';
 import 'package:visko_rocky_flutter/theme/app_theme.dart';
+
+// final favCtrl = Get.find<FavoriteController>();
+// final int propertyId = property['property_id'];
 
 const String baseURL = "https://apimanager.viskorealestate.com";
 
@@ -17,14 +23,15 @@ class HomePropertyCard extends StatefulWidget {
   final VoidCallback onTap;
 
   /// This callback removes the card from Favorite List page
-  final VoidCallback? onFavoriteRemoved;
+  // final VoidCallback? onFavoriteRemoved;
 
   const HomePropertyCard({
     super.key,
     required this.property,
     required this.isDark,
     required this.onTap,
-    this.onFavoriteRemoved,
+    required image,
+    // this.onFavoriteRemoved,
   });
 
   @override
@@ -33,86 +40,88 @@ class HomePropertyCard extends StatefulWidget {
 
 class _HomePropertyCardState extends State<HomePropertyCard>
     with SingleTickerProviderStateMixin {
-  bool isFavorite = false;
-  bool loadingFav = false;
+  // bool isFavorite = false;
+  // bool loadingFav = false;
 
   // small press animation
   double _scale = 1.0;
 
-  @override
-  void initState() {
-    super.initState();
-    checkFavoriteStatus();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   checkFavoriteStatus();
+  // }
 
   /// 🔍 Check if THIS property is already in user's favorites
-  Future<void> checkFavoriteStatus() async {
-    try {
-      final response = await http.get(Uri.parse("$baseURL/favorites/user"));
+  // Future<void> checkFavoriteStatus() async {
+  //   try {
+  //     final response = await http.get(Uri.parse("$baseURL/favorites/user"));
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+  //     if (response.statusCode == 200) {
+  //       final data = json.decode(response.body);
 
-        List favList = [];
-        if (data['favorite_properties'] != null) {
-          favList = data['favorite_properties'];
-        } else if (data['favorites'] != null) {
-          favList = data['favorites'];
-        } else if (data['data'] != null) {
-          favList = data['data'];
-        }
+  //       List favList = [];
+  //       if (data['favorite_properties'] != null) {
+  //         favList = data['favorite_properties'];
+  //       } else if (data['favorites'] != null) {
+  //         favList = data['favorites'];
+  //       } else if (data['data'] != null) {
+  //         favList = data['data'];
+  //       }
 
-        final id = widget.property['property_id'];
+  //       final id = widget.property['property_id'];
 
-        setState(() {
-          isFavorite = favList
-              .any((item) => item['property_id'].toString() == id.toString());
-        });
-      }
-    } catch (e) {
-      // silent fail - leave isFavorite as is
-      debugPrint("Error fetching favorites: $e");
-    }
-  }
+  //       setState(() {
+  //         isFavorite = favList
+  //             .any((item) => item['property_id'].toString() == id.toString());
+  //       });
+  //     }
+  //   } catch (e) {
+  //     // silent fail - leave isFavorite as is
+  //     debugPrint("Error fetching favorites: $e");
+  //   }
+  // }
 
-  /// ❤️ Toggle Add / Remove From Favorites
-  Future<void> toggleFavorite() async {
-    if (loadingFav) return;
-    setState(() {
-      loadingFav = true;
-      // optimistic UI update
-      isFavorite = !isFavorite;
-    });
+  // /// ❤️ Toggle Add / Remove From Favorites
+  // Future<void> toggleFavorite() async {
+  //   if (loadingFav) return;
+  //   setState(() {
+  //     loadingFav = true;
+  //     // optimistic UI update
+  //     isFavorite = !isFavorite;
+  //   });
 
-    final propertyId = widget.property['property_id'];
-    final url = isFavorite
-        ? "$baseURL/api/favorites/add"
-        : "$baseURL/api/favorites/remove";
+  //   final propertyId = widget.property['property_id'];
+  //   final url = isFavorite
+  //       ? "$baseURL/api/favorites/add"
+  //       : "$baseURL/api/favorites/remove";
 
-    try {
-      final response =
-          await http.post(Uri.parse(url), body: {"property_id": "$propertyId"});
+  //   try {
+  //     final response =
+  //         await http.post(Uri.parse(url), body: {"property_id": "$propertyId"});
 
-      // if failure, rollback optimistic update
-      if (response.statusCode != 200) {
-        setState(() => isFavorite = !isFavorite);
-      } else {
-        // If removed AND card is shown in Favorite List
-        if (!isFavorite && widget.onFavoriteRemoved != null) {
-          // delay a tiny bit for animation smoothness
-          await Future.delayed(const Duration(milliseconds: 150));
-          widget.onFavoriteRemoved!();
-        }
-      }
-    } catch (e) {
-      debugPrint("Favorite Toggle Exception: $e");
-      setState(() => isFavorite = !isFavorite);
-    } finally {
-      if (mounted) {
-        setState(() => loadingFav = false);
-      }
-    }
-  }
+  //     // if failure, rollback optimistic update
+  //     if (response.statusCode != 200) {
+  //       setState(() => isFavorite = !isFavorite);
+  //     } else {
+  //       // If removed AND card is shown in Favorite List
+  //       if (!isFavorite && widget.onFavoriteRemoved != null) {
+  //         // delay a tiny bit for animation smoothness
+  //         await Future.delayed(const Duration(milliseconds: 150));
+  //         widget.onFavoriteRemoved!();
+  //       }
+  //     }
+  //   } catch (e) {
+  //     debugPrint("Favorite Toggle Exception: $e");
+  //     setState(() => isFavorite = !isFavorite);
+  //   } finally {
+  //     if (mounted) {
+  //       setState(() => loadingFav = false);
+  //     }
+  //   }
+  // }
+
+  final FavoriteController favCtrl = Get.find<FavoriteController>();
 
   void _onTapDown(_) {
     setState(() => _scale = 0.985);
@@ -124,9 +133,11 @@ class _HomePropertyCardState extends State<HomePropertyCard>
 
   @override
   Widget build(BuildContext context) {
+    final property = widget.property;
+    final String propertyId = property['property_id'].toString();
+
     final glass = Theme.of(context).extension<GlassColors>()!;
     final primary = Theme.of(context).primaryColor;
-    final property = widget.property;
 
     final String title = property['property_name'] ?? "No Title";
     final String city = property['property_city'] ?? "Unknown";
@@ -173,9 +184,7 @@ class _HomePropertyCardState extends State<HomePropertyCard>
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.black.withOpacity(0.45)
-                        : primary.withOpacity(0.12),
+                    color: glass.glassBorder.withOpacity(0.25),
                     blurRadius: 18,
                     offset: const Offset(0, 8),
                   ),
@@ -199,7 +208,7 @@ class _HomePropertyCardState extends State<HomePropertyCard>
                         child: Container(
                           width: 148,
                           height: 120,
-                          color: glass.chipUnselectedStart.withOpacity(0.15),
+                          color: glass.chipUnselectedStart,
                           child: imageUrl != null
                               ? Image.network(
                                   imageUrl,
@@ -234,14 +243,13 @@ class _HomePropertyCardState extends State<HomePropertyCard>
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
-                                _glassCircleIcon(
-                                  icon: Icons.open_in_new_rounded,
-                                  glass: glass,
-                                  primary: primary,
-                                  tooltip: "View details",
-                                  onTap: () => widget.onTap(),
-                                ),
+                                // const SizedBox(width: 8),
+                                // _glassCircleIcon(
+                                //   icon: Icons.open_in_new_rounded,
+                                //   glass: glass,
+                                //   tooltip: "View details",
+                                //   onTap: () => widget.onTap(),
+                                // ),
                               ],
                             ),
 
@@ -322,7 +330,8 @@ class _HomePropertyCardState extends State<HomePropertyCard>
                           height: 34,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                                backgroundColor: kPrimaryOrange,
+                                // backgroundColor: kPrimaryOrange,
+                                backgroundColor: primary,
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12))),
                             onPressed: () {
@@ -346,90 +355,98 @@ class _HomePropertyCardState extends State<HomePropertyCard>
                           ),
                         ),
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 12),
 
                       /// ❤️ Favorite + Share
                       Row(
                         children: [
-                          GestureDetector(
-                            onTap: toggleFavorite,
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: isFavorite
-                                    ? LinearGradient(
-                                        colors: [
-                                          glass.chipSelectedGradientStart,
-                                          glass.chipSelectedGradientEnd,
-                                        ],
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                      )
-                                    : null,
-                                color:
-                                    isFavorite ? null : glass.glassBackground,
-                                border: Border.all(
-                                  color: glass.glassBorder,
+                          // GestureDetector(
+                          //   onTap: toggleFavorite,
+                          //   child: Container(
+                          //     padding: const EdgeInsets.all(7),
+                          //     decoration: BoxDecoration(
+                          //       shape: BoxShape.circle,
+                          //       gradient: isFavorite
+                          //           ? LinearGradient(
+                          //               colors: [
+                          //                 glass.chipSelectedGradientStart,
+                          //                 glass.chipSelectedGradientEnd
+                          //               ],
+                          //               begin: Alignment.topLeft,
+                          //               end: Alignment.bottomRight,
+                          //             )
+                          //           : null,
+                          //       color:
+                          //           isFavorite ? null : glass.glassBackground,
+                          //       border: Border.all(
+                          //           color: glass.glassBorder, width: 2.5),
+                          //     ),
+                          //     child: loadingFav
+                          //         ? SizedBox(
+                          //             width: 20,
+                          //             height: 20,
+                          //             child: CircularProgressIndicator(
+                          //               strokeWidth: 2,
+                          //               valueColor:
+                          //                   AlwaysStoppedAnimation(primary),
+                          //             ),
+                          //           )
+                          //         : Icon(
+                          //             isFavorite
+                          //                 ? Icons.favorite
+                          //                 : Icons.favorite_border,
+                          //             color: isFavorite
+                          //                 ? glass.solidSurface
+                          //                 : glass.textSecondary,
+                          //             size: 20,
+                          //           ),
+                          //   ),
+                          // ),
+
+                          Obx(() {
+                            final isFav = favCtrl.isFavorite(propertyId);
+
+                            return GestureDetector(
+                              onTap: () => favCtrl.toggleFavorite(property),
+                              child: Container(
+                                padding: const EdgeInsets.all(7),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: isFav
+                                      ? LinearGradient(
+                                          colors: [
+                                            glass.chipSelectedGradientStart,
+                                            glass.chipSelectedGradientEnd,
+                                          ],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        )
+                                      : null,
+                                  color: isFav ? null : glass.glassBackground,
+                                  border: Border.all(
+                                    color: glass.glassBorder,
+                                    width: 2.5,
+                                  ),
                                 ),
-                                boxShadow: [
-                                  if (isFavorite)
-                                    BoxShadow(
-                                      color: glass.chipSelectedGradientStart
-                                          .withOpacity(0.18),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 6),
-                                    )
-                                  else
-                                    BoxShadow(
-                                      color: Theme.of(context).brightness ==
-                                              Brightness.dark
-                                          ? Colors.black.withOpacity(0.25)
-                                          : primary.withOpacity(0.06),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 4),
-                                    )
-                                ],
+                                child: Icon(
+                                  isFav
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  color: isFav
+                                      ? glass.solidSurface
+                                      : glass.textSecondary,
+                                  size: 20,
+                                ),
                               ),
-                              child: loadingFav
-                                  ? SizedBox(
-                                      width: 28,
-                                      height: 28,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.2,
-                                        valueColor:
-                                            AlwaysStoppedAnimation(primary),
-                                      ),
-                                    )
-                                  : AnimatedSwitcher(
-                                      duration:
-                                          const Duration(milliseconds: 260),
-                                      transitionBuilder: (child, animation) =>
-                                          ScaleTransition(
-                                        scale: animation,
-                                        child: child,
-                                      ),
-                                      child: Icon(
-                                        key: ValueKey<bool>(isFavorite),
-                                        isFavorite
-                                            ? Icons.favorite
-                                            : Icons.favorite_border,
-                                        size: 20,
-                                        color: isFavorite
-                                            ? Colors.white
-                                            : glass.chipSelectedGradientStart,
-                                      ),
-                                    ),
-                            ),
-                          ),
+                            );
+                          }),
+
                           const SizedBox(width: 6),
                           GestureDetector(
                             onTap: () => Share.share("🏡 $title\n📍 $city\n🔗"),
                             child: _glassCircleIcon(
                               icon: Icons.share,
                               glass: glass,
-                              primary: primary,
                               tooltip: "Share",
                               onTap: () => Share.share(
                                   "🏡 $title\n📍 $city\n🔗 ${property['slug'] ?? ''}"),
@@ -460,11 +477,9 @@ class _HomePropertyCardState extends State<HomePropertyCard>
     );
   }
 
-  /// 🔹 Glass circular icon helper
   Widget _glassCircleIcon({
     required IconData icon,
     required GlassColors glass,
-    required Color primary,
     String? tooltip,
     VoidCallback? onTap,
   }) {
@@ -480,11 +495,16 @@ class _HomePropertyCardState extends State<HomePropertyCard>
               height: 36,
               width: 36,
               decoration: BoxDecoration(
-                color: glass.glassBackground,
+                color: glass.glassBackground, // theme background
                 shape: BoxShape.circle,
-                border: Border.all(color: glass.glassBorder),
+                border: Border.all(
+                    color: glass.glassBorder, width: 2.5), // theme border
               ),
-              child: Icon(icon, size: 18, color: primary),
+              child: Icon(
+                icon,
+                size: 18,
+                color: glass.textPrimary, // theme text color
+              ),
             ),
           ),
         ),
@@ -492,4 +512,3 @@ class _HomePropertyCardState extends State<HomePropertyCard>
     );
   }
 }
-// this is my card design code and i want to show this card horizental design so make this card design horzental screen according and give me full code chnage only ui design and use only my theme accordign color don't add a new init so give me full code

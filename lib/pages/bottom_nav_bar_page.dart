@@ -152,14 +152,14 @@ import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:get/get.dart';
 import 'package:visko_rocky_flutter/component/inquiry_form.dart';
-import 'package:visko_rocky_flutter/pages/categories_page.dart';
+import 'package:visko_rocky_flutter/pages/Categories_page.dart';
 import 'package:visko_rocky_flutter/pages/home.dart';
 import 'package:visko_rocky_flutter/pages/favorite_page.dart';
 import 'package:visko_rocky_flutter/pages/location_page.dart';
 import 'package:visko_rocky_flutter/pages/testing.dart';
 import '../controller/theme_controller.dart';
 import 'package:visko_rocky_flutter/theme/app_theme.dart';
-import 'account_setting_page.dart';
+import 'Account_setting_page.dart';
 
 class BottomNavBarPage extends StatefulWidget {
   @override

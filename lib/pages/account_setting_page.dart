@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:visko_rocky_flutter/controller/personal_info_controller.dart';
 
 import 'package:visko_rocky_flutter/pages/Setting/contact_information_page.dart';
 import 'package:visko_rocky_flutter/pages/Setting/personal_info_page.dart';
@@ -18,35 +19,41 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeController = Get.find<ThemeController>();
     final glass = Theme.of(context).extension<GlassColors>()!;
-
+    final primary = Theme.of(context).primaryColor;
+    Get.put(PersonalInfoController());
     return Obx(() {
       final isDark = themeController.isDark.value;
 
       return Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+
+        // ---------------- APP BAR ----------------
         appBar: AppBar(
-          title: const Text("Settings"),
+          title: Text(
+            "Settings",
+            style: TextStyle(color: glass.textPrimary), // 🔥 UPDATED
+          ),
           centerTitle: true,
-          backgroundColor: Colors.transparent,
+          backgroundColor: glass.solidSurface, // 🔥 UPDATED (no transparent)
           elevation: 0,
+          iconTheme: IconThemeData(color: glass.textPrimary), // 🔥 UPDATED
           actions: [
             IconButton(
               icon: Icon(
                 isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-                color: glass.textPrimary,
+                color: glass.textPrimary, // 🔥 UPDATED
               ),
               onPressed: themeController.toggleTheme,
             )
           ],
         ),
+
+        // ---------------- BODY ----------------
         body: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            /// PROFILE HEADER
-            _profileHeader(glass),
+            _profile(glass),
             const SizedBox(height: 30),
-
-            /// PERSONAL INFORMATION
             _sectionCard(
               glass,
               title: "Personal Information",
@@ -59,8 +66,6 @@ class SettingsPage extends StatelessWidget {
                 ),
               ],
             ),
-
-            /// CONTACT INFORMATION
             _sectionCard(
               glass,
               title: "Contact Information",
@@ -73,8 +78,6 @@ class SettingsPage extends StatelessWidget {
                 ),
               ],
             ),
-
-            /// APP SETTINGS
             _sectionCard(
               glass,
               title: "App Settings",
@@ -84,17 +87,17 @@ class SettingsPage extends StatelessWidget {
                   title: "Notifications",
                   icon: Icons.notifications_active,
                   value: true.obs,
+                  primary: primary, // 🔥 UPDATED
                 ),
                 _switchTile(
                   glass,
                   title: "Dark Mode",
                   icon: Icons.dark_mode,
                   value: themeController.isDark,
+                  primary: primary, // 🔥 UPDATED
                 ),
               ],
             ),
-
-            /// SUPPORT
             _sectionCard(
               glass,
               title: "Contact Support",
@@ -107,8 +110,6 @@ class SettingsPage extends StatelessWidget {
                 ),
               ],
             ),
-
-            /// PROPERTY ADVISOR
             _sectionCard(
               glass,
               title: "Talk to Property Advisor",
@@ -121,8 +122,6 @@ class SettingsPage extends StatelessWidget {
                 ),
               ],
             ),
-
-            /// TERMS & PRIVACY
             _sectionCard(
               glass,
               title: "Terms & Privacy",
@@ -162,7 +161,6 @@ class SettingsPage extends StatelessWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 40),
           ],
         ),
@@ -171,56 +169,60 @@ class SettingsPage extends StatelessWidget {
   }
 
   // ===============================================================
-  // WIDGETS
+  // PROFILE HEADER
   // ===============================================================
 
-  Widget _profileHeader(GlassColors glass) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(30),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: glass.glassBackground,
-            border: Border.all(color: glass.glassBorder),
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Row(
-            children: [
-              const CircleAvatar(
-                radius: 32,
-                backgroundImage: NetworkImage(
-                  "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=500",
-                ),
+  Widget _profile(GlassColors glass) {
+    final info = Get.find<PersonalInfoController>();
+
+    return Obx(() => ClipRRect(
+          borderRadius: BorderRadius.circular(30),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: glass.glassBackground,
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(color: glass.glassBorder),
               ),
-              const SizedBox(width: 15),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  Text(
-                    "Akash Visko",
-                    style: TextStyle(
-                      color: glass.textPrimary,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  CircleAvatar(
+                    radius: 32,
+                    backgroundColor: glass.solidSurface,
                   ),
-                  Text(
-                    "View & edit profile",
-                    style: TextStyle(
-                      color: glass.textSecondary,
-                      fontSize: 13,
-                    ),
-                  ),
+                  const SizedBox(width: 15),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        info.name.value.isEmpty ? "Your Name" : info.name.value,
+                        style: TextStyle(
+                          color: glass.textPrimary,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        info.gender.value,
+                        style: TextStyle(
+                          color: glass.textSecondary,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  )
                 ],
-              )
-            ],
+              ),
+            ),
           ),
-        ),
-      ),
-    );
+        ));
   }
+
+  // ===============================================================
+  // SECTION CARD
+  // ===============================================================
 
   Widget _sectionCard(
     GlassColors glass, {
@@ -260,6 +262,10 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
+  // ===============================================================
+  // SETTING TILE
+  // ===============================================================
+
   Widget _settingTile(
     GlassColors glass,
     IconData icon,
@@ -271,29 +277,45 @@ class SettingsPage extends StatelessWidget {
       leading: Icon(icon, color: glass.textPrimary),
       title: Text(
         title,
-        style: TextStyle(color: glass.textPrimary, fontSize: 14),
+        style: TextStyle(
+          color: glass.textPrimary,
+          fontSize: 14,
+        ),
       ),
-      trailing:
-          Icon(Icons.arrow_forward_ios, size: 14, color: glass.textSecondary),
+      trailing: Icon(
+        Icons.arrow_forward_ios,
+        size: 14,
+        color: glass.textSecondary,
+      ),
     );
   }
+
+  // ===============================================================
+  // SWITCH TILE
+  // ===============================================================
 
   Widget _switchTile(
     GlassColors glass, {
     required String title,
     required IconData icon,
     required RxBool value,
+    required Color primary,
   }) {
     return Obx(
       () => ListTile(
         leading: Icon(icon, color: glass.textPrimary),
         title: Text(
           title,
-          style: TextStyle(color: glass.textPrimary, fontSize: 14),
+          style: TextStyle(
+            color: glass.textPrimary,
+            fontSize: 14,
+          ),
         ),
         trailing: Switch(
           value: value.value,
-          activeColor: glass.chipSelectedGradientStart,
+          activeColor: glass.chipSelectedGradientStart, // 🔥 UPDATED
+          inactiveThumbColor: glass.textSecondary, // 🔥 UPDATED
+          inactiveTrackColor: glass.glassBorder, // 🔥 UPDATED
           onChanged: (v) => value.value = v,
         ),
       ),

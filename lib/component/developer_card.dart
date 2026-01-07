@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:visko_rocky_flutter/pages/developer_properties.dart';
+import 'package:visko_rocky_flutter/pages/Developer_properties.dart';
 import 'package:visko_rocky_flutter/theme/app_theme.dart';
 import '../config/colors.dart';
 
@@ -15,7 +15,7 @@ class DeveloperCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final glass = Theme.of(context).extension<GlassColors>()!;
-
+    final primary = Theme.of(context).primaryColor;
     return GestureDetector(
       onTap: () {
         Get.to(() => DeveloperProperties(
@@ -38,7 +38,7 @@ class DeveloperCard extends StatelessWidget {
                     BoxShadow(
                       color: Theme.of(context).brightness == Brightness.dark
                           ? Colors.black.withOpacity(0.45)
-                          : Colors.orange.shade100.withOpacity(0.25),
+                          : primary.withOpacity(0.15),
                       blurRadius: 15,
                       offset: const Offset(0, 6),
                     ),
@@ -69,14 +69,14 @@ class DeveloperCard extends StatelessWidget {
                     placeholder: (context, url) => Container(
                       width: double.infinity,
                       height: 150,
-                      color: Colors.grey.shade200,
+                      color: glass.chipUnselectedStart,
                       child: const Center(child: CircularProgressIndicator()),
                     ),
                     errorWidget: (context, url, error) => Container(
                       width: double.infinity,
                       height: 150,
-                      color: Colors.grey.shade200,
-                      child: const Icon(Icons.error, color: Colors.red),
+                      color: glass.chipUnselectedStart,
+                      child: Icon(Icons.error, color: glass.textSecondary),
                     ),
                   ),
                 ),
@@ -92,8 +92,8 @@ class DeveloperCard extends StatelessWidget {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.black.withOpacity(0.1),
-                      Colors.black.withOpacity(0.10),
+                      glass.solidSurface.withOpacity(0.05),
+                      glass.solidSurface.withOpacity(0.05),
                     ],
                   ),
                 ),
@@ -107,13 +107,13 @@ class DeveloperCard extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                 decoration: BoxDecoration(
-                  color: kPrimaryOrange,
+                  color: primary,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: glass.glassBorder),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.star, size: 14, color: Colors.white),
+                    Icon(Icons.star, size: 14, color: glass.textPrimary),
                     const SizedBox(width: 6),
                     Text(
                       (dev['rating'] ?? "4.8").toString(),
@@ -199,7 +199,7 @@ class DeveloperCard extends StatelessWidget {
                             dev['developer_type'] ?? 'Builder',
                             style: TextStyle(
                               fontSize: 12,
-                              color: kPrimaryOrange,
+                              color: primary,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

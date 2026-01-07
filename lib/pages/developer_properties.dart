@@ -137,6 +137,7 @@ class _DeveloperPropertiesState extends State<DeveloperProperties> {
                                         property: null,
                                       ));
                                 },
+                                image: null,
                               ),
                             ),
                           ],

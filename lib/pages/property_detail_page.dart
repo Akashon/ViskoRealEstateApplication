@@ -1,21 +1,55 @@
-// // property_detail_page.dart
+// // this is my  property_detail_page.dart
 // import 'dart:convert';
 // import 'dart:ui';
 // import 'package:flutter/material.dart';
 // import 'package:get/get.dart';
 // import 'package:http/http.dart' as http;
+// import 'package:share_plus/share_plus.dart';
 // import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 // import 'package:visko_rocky_flutter/component/inquiry_form.dart';
 // import 'package:visko_rocky_flutter/controller/theme_controller.dart';
-
-// const Color kPrimaryOrange = Color(0xffF26A33);
+// import 'package:visko_rocky_flutter/theme/app_theme.dart';
+// import 'package:path_provider/path_provider.dart';
+// import 'dart:io';
+// import 'package:open_filex/open_filex.dart';
 
 // class PropertyDetailPage extends StatefulWidget {
 //   final String slug;
-//   const PropertyDetailPage({required this.slug, super.key});
+//   const PropertyDetailPage({required this.slug, super.key, required property});
 
 //   @override
 //   _PropertyDetailPageState createState() => _PropertyDetailPageState();
+// }
+
+// Future<void> downloadAndOpenPDF(String url) async {
+//   try {
+//     final response = await http.get(Uri.parse(url));
+//     if (response.statusCode == 200) {
+//       final bytes = response.bodyBytes;
+
+//       final dir = await getApplicationDocumentsDirectory();
+//       final file = File('${dir.path}/property_brochure.pdf');
+
+//       await file.writeAsBytes(bytes, flush: true);
+
+//       // Open the PDF
+//       await OpenFilex.open(file.path);
+//     } else {
+//       Get.snackbar(
+//         "Download Failed",
+//         "Could not download brochure",
+//         // backgroundColor: Theme.of(context).primaryColor.withOpacity(0.9),
+//         colorText: Colors.white,
+//       );
+//     }
+//   } catch (e) {
+//     Get.snackbar(
+//       "Error",
+//       "Something went wrong: $e",
+//       // backgroundColor: Theme.of(context).primaryColor.withOpacity(0.9),
+//       colorText: Colors.white,
+//     );
+//   }
 // }
 
 // class _PropertyDetailPageState extends State<PropertyDetailPage>
@@ -25,8 +59,9 @@
 //   int activeIndex = 0;
 //   late TabController _tabController;
 //   final PageController _pageController = PageController();
-
 //   final ThemeController themeController = Get.find<ThemeController>();
+
+//   GlassColors get glassColors => Theme.of(context).extension<GlassColors>()!;
 
 //   @override
 //   void initState() {
@@ -93,15 +128,14 @@
 //                       child: Column(
 //                         crossAxisAlignment: CrossAxisAlignment.start,
 //                         children: [
-//                           // ---------- IMAGE BANNER (Full image banner + glass overlay) ----------
+//                           // IMAGE BANNER
 //                           Stack(
 //                             children: [
 //                               SizedBox(
-//                                 height: 340,
+//                                 height: 480,
 //                                 child: GestureDetector(
 //                                   onTap: () => openFullScreenImage(
-//                                     _getImageAtIndex(activeIndex),
-//                                   ),
+//                                       _getImageAtIndex(activeIndex)),
 //                                   child: PageView.builder(
 //                                     controller: _pageController,
 //                                     itemCount: _imagesLength(),
@@ -113,9 +147,7 @@
 //                                     itemBuilder: (_, index) {
 //                                       final img = _getImageAtIndex(index);
 //                                       return Container(
-//                                         color: isDark
-//                                             ? Colors.black
-//                                             : Colors.grey.shade200,
+//                                         color: glassColors.cardBackground,
 //                                         child: Image.network(
 //                                           img,
 //                                           width: double.infinity,
@@ -124,9 +156,7 @@
 //                                               (context, child, progress) {
 //                                             if (progress == null) return child;
 //                                             return Container(
-//                                               color: isDark
-//                                                   ? Colors.black
-//                                                   : Colors.grey.shade200,
+//                                               color: glassColors.cardBackground,
 //                                               child: const Center(
 //                                                 child:
 //                                                     CircularProgressIndicator(),
@@ -136,9 +166,7 @@
 //                                           errorBuilder:
 //                                               (context, error, stackTrace) {
 //                                             return Container(
-//                                               color: isDark
-//                                                   ? Colors.black
-//                                                   : Colors.grey.shade200,
+//                                               color: glassColors.cardBackground,
 //                                               child: const Center(
 //                                                 child: Icon(Icons.broken_image),
 //                                               ),
@@ -151,30 +179,7 @@
 //                                 ),
 //                               ),
 
-//                               // subtle dark gradient at bottom for readability
-//                               // Positioned(
-//                               //   bottom: 0,
-//                               //   left: 0,
-//                               //   right: 0,
-//                               //   child: Container(
-//                               //     height: 120,
-//                               //     decoration: BoxDecoration(
-//                               //       gradient: LinearGradient(
-//                               //         begin: Alignment.topCenter,
-//                               //         end: Alignment.bottomCenter,
-//                               //         colors: [
-//                               //           Colors.transparent,
-//                               //           (isDark
-//                               //                   ? Colors.black.withOpacity(0.55)
-//                               //                   : Colors.black.withOpacity(0.28))
-//                               //               .withOpacity(1),
-//                               //         ],
-//                               //       ),
-//                               //     ),
-//                               //   ),
-//                               // ),
-
-//                               // page indicator - centered bottom
+//                               // Page indicator
 //                               Positioned(
 //                                 bottom: 18,
 //                                 left: 0,
@@ -184,10 +189,9 @@
 //                                     activeIndex: activeIndex,
 //                                     count: _imagesLength(),
 //                                     effect: ExpandingDotsEffect(
-//                                       activeDotColor: kPrimaryOrange,
-//                                       dotColor: isDark
-//                                           ? Colors.white24
-//                                           : Colors.white70,
+//                                       activeDotColor:
+//                                           Theme.of(context).primaryColor,
+//                                       dotColor: glassColors.textSecondary,
 //                                       dotHeight: 8,
 //                                       dotWidth: 8,
 //                                     ),
@@ -195,55 +199,43 @@
 //                                 ),
 //                               ),
 
-//                               // Top left / right glass circle buttons
+//                               // Back & action buttons
+
 //                               Positioned(
-//                                 top: 18,
+//                                 top: 40,
 //                                 left: 14,
-//                                 child: glassCircle(
-//                                   child: IconButton(
-//                                     icon: Icon(
-//                                       Icons.arrow_back_ios,
-//                                       color:
-//                                           isDark ? Colors.white : Colors.black,
-//                                     ),
-//                                     onPressed: () => Navigator.pop(context),
-//                                   ),
-//                                   isDark: isDark,
+//                                 child: _glassCircleIcon(
+//                                   icon: Icons.arrow_back_ios_new,
+//                                   tooltip: 'Back',
+//                                   onTap: () => Navigator.pop(context),
 //                                 ),
 //                               ),
+
 //                               Positioned(
-//                                 top: 18,
+//                                 top: 40,
 //                                 right: 16,
 //                                 child: Row(
 //                                   children: [
-//                                     glassCircle(
-//                                       child: IconButton(
-//                                         icon: Icon(
-//                                           Icons.share,
-//                                           color: isDark
-//                                               ? Colors.white
-//                                               : Colors.black,
-//                                         ),
-//                                         onPressed: () {
-//                                           // TODO: share
-//                                         },
-//                                       ),
-//                                       isDark: isDark,
+//                                     _glassCircleIcon(
+//                                       icon: Icons.share,
+//                                       tooltip: 'Share',
+//                                       onTap: () {
+//                                         final title =
+//                                             property?['title'] ?? 'Property';
+//                                         final link = property?['url'] ??
+//                                             'https://visko-realestate.com';
+
+//                                         Share.share(
+//                                           'Check this property: $title\n\n$link',
+//                                           subject: 'VISKO Property Share',
+//                                         );
+//                                       },
 //                                     ),
-//                                     const SizedBox(width: 8),
-//                                     glassCircle(
-//                                       child: IconButton(
-//                                         icon: Icon(
-//                                           Icons.favorite_border,
-//                                           color: isDark
-//                                               ? Colors.white
-//                                               : Colors.black,
-//                                         ),
-//                                         onPressed: () {
-//                                           // TODO: favorite
-//                                         },
-//                                       ),
-//                                       isDark: isDark,
+//                                     const SizedBox(width: 10),
+//                                     _glassCircleIcon(
+//                                       icon: Icons.favorite_border,
+//                                       tooltip: 'Wishlist',
+//                                       onTap: () {},
 //                                     ),
 //                                   ],
 //                                 ),
@@ -253,7 +245,7 @@
 
 //                           const SizedBox(height: 12),
 
-//                           // Thumbnails row with subtle glass border
+//                           // Thumbnails
 //                           SizedBox(
 //                             height: 76,
 //                             child: ListView.builder(
@@ -276,33 +268,17 @@
 //                                   child: AnimatedContainer(
 //                                     duration: const Duration(milliseconds: 220),
 //                                     margin: const EdgeInsets.symmetric(
-//                                       horizontal: 6,
-//                                       vertical: 8,
-//                                     ),
+//                                         horizontal: 6, vertical: 8),
 //                                     padding: const EdgeInsets.all(3),
 //                                     decoration: BoxDecoration(
 //                                       borderRadius: BorderRadius.circular(10),
 //                                       border: Border.all(
 //                                         color: isActive
-//                                             ? kPrimaryOrange
-//                                             : (isDark
-//                                                 ? Colors.white12
-//                                                 : Colors.transparent),
+//                                             ? Theme.of(context).primaryColor
+//                                             : glassColors.glassBorder,
 //                                         width: isActive ? 2 : 1,
 //                                       ),
-//                                       boxShadow: [
-//                                         if (!isDark)
-//                                           BoxShadow(
-//                                             color: Colors.black12,
-//                                             blurRadius: 6,
-//                                             offset: Offset(0, 3),
-//                                           ),
-//                                       ],
-//                                       color: isDark
-//                                           ? Colors.white24.withOpacity(
-//                                               isActive ? 0.04 : 0.02,
-//                                             )
-//                                           : Colors.white,
+//                                       color: glassColors.cardBackground,
 //                                     ),
 //                                     child: ClipRRect(
 //                                       borderRadius: BorderRadius.circular(8),
@@ -314,9 +290,7 @@
 //                                         errorBuilder: (_, __, ___) => Container(
 //                                           width: 64,
 //                                           height: 64,
-//                                           color: isDark
-//                                               ? Colors.grey[900]
-//                                               : Colors.grey[200],
+//                                           color: glassColors.cardBackground,
 //                                           child: const Icon(Icons.broken_image),
 //                                         ),
 //                                       ),
@@ -329,31 +303,22 @@
 
 //                           const SizedBox(height: 8),
 
-//                           // Tag + basic info row
+//                           // Tag + sqft
 //                           Padding(
 //                             padding:
 //                                 const EdgeInsets.symmetric(horizontal: 16.0),
 //                             child: Row(
 //                               children: [
 //                                 _smallTag(
-//                                   property?['property_type']?.toString() ?? '',
-//                                   isDark: isDark,
-//                                 ),
+//                                     property?['property_type']?.toString() ??
+//                                         ''),
 //                                 const Spacer(),
-//                                 const Icon(
-//                                   Icons.square_foot,
-//                                   size: 18,
-//                                   color: kPrimaryOrange,
-//                                 ),
+//                                 const Icon(Icons.square_foot,
+//                                     size: 18, color: kPrimaryOrange),
 //                                 const SizedBox(width: 6),
-//                                 Text(
-//                                   _sqftText(),
-//                                   style: TextStyle(
-//                                     color: isDark
-//                                         ? Colors.white70
-//                                         : Colors.black87,
-//                                   ),
-//                                 ),
+//                                 Text(_sqftText(),
+//                                     style: TextStyle(
+//                                         color: glassColors.textSecondary)),
 //                               ],
 //                             ),
 //                           ),
@@ -373,20 +338,15 @@
 //                                   style: TextStyle(
 //                                     fontSize: 20,
 //                                     fontWeight: FontWeight.w700,
-//                                     color:
-//                                         isDark ? Colors.white : Colors.black87,
+//                                     color: glassColors.textPrimary,
 //                                   ),
 //                                 ),
 //                                 const SizedBox(height: 6),
 //                                 Row(
 //                                   children: [
-//                                     Icon(
-//                                       Icons.location_on,
-//                                       size: 14,
-//                                       color: isDark
-//                                           ? Colors.white70
-//                                           : kPrimaryOrange,
-//                                     ),
+//                                     Icon(Icons.location_on,
+//                                         size: 14,
+//                                         color: Theme.of(context).primaryColor),
 //                                     const SizedBox(width: 6),
 //                                     Expanded(
 //                                       child: Text(
@@ -394,11 +354,8 @@
 //                                                 ?.toString() ??
 //                                             '',
 //                                         style: TextStyle(
-//                                           color: isDark
-//                                               ? Colors.white70
-//                                               : Colors.grey[700],
-//                                           fontSize: 14,
-//                                         ),
+//                                             color: glassColors.textSecondary,
+//                                             fontSize: 14),
 //                                       ),
 //                                     ),
 //                                   ],
@@ -409,33 +366,27 @@
 
 //                           const SizedBox(height: 12),
 
-//                           // Tab bar styled to match glass look
+//                           // Tab bar
 //                           Padding(
 //                             padding:
 //                                 const EdgeInsets.symmetric(horizontal: 12.0),
 //                             child: Container(
 //                               decoration: BoxDecoration(
 //                                 borderRadius: BorderRadius.circular(12),
-//                                 color: isDark
-//                                     ? Colors.white.withOpacity(0.02)
-//                                     : Colors.white.withOpacity(0.75),
-//                                 border: Border.all(
-//                                   color: isDark
-//                                       ? Colors.white12
-//                                       : Colors.grey.shade200,
-//                                 ),
+//                                 color: glassColors.cardBackground,
+//                                 border:
+//                                     Border.all(color: glassColors.glassBorder),
 //                               ),
 //                               child: TabBar(
 //                                 controller: _tabController,
-//                                 labelColor: kPrimaryOrange,
-//                                 unselectedLabelColor:
-//                                     isDark ? Colors.white54 : Colors.grey,
-//                                 indicatorColor: kPrimaryOrange,
+//                                 labelColor: Theme.of(context).primaryColor,
+//                                 unselectedLabelColor: glassColors.textSecondary,
+//                                 indicatorColor: Theme.of(context).primaryColor,
 //                                 indicatorWeight: 3,
 //                                 tabs: const [
 //                                   Tab(text: 'About'),
 //                                   Tab(text: 'Gallery'),
-//                                   Tab(text: 'Review'),
+//                                   Tab(text: 'View Map'),
 //                                 ],
 //                               ),
 //                             ),
@@ -458,11 +409,9 @@
 //                                           Tag(property!['property_category'] ??
 //                                               ''),
 //                                           const SizedBox(width: 8),
-//                                           Tag(
-//                                             property!['property_subcategory'] ??
-//                                                 '',
-//                                           ),
-//                                           const SizedBox(width: 8),
+//                                           Tag(property![
+//                                                   'property_subcategory'] ??
+//                                               ''),
 //                                         ],
 //                                       ),
 //                                       const SizedBox(height: 12),
@@ -471,9 +420,7 @@
 //                                         style: TextStyle(
 //                                           fontWeight: FontWeight.bold,
 //                                           fontSize: 16,
-//                                           color: isDark
-//                                               ? Colors.white
-//                                               : Colors.black87,
+//                                           color: glassColors.textPrimary,
 //                                         ),
 //                                       ),
 //                                       const SizedBox(height: 8),
@@ -482,10 +429,7 @@
 //                                                 ?.toString() ??
 //                                             'No description available.',
 //                                         style: TextStyle(
-//                                           color: isDark
-//                                               ? Colors.white70
-//                                               : Colors.black87,
-//                                         ),
+//                                             color: glassColors.textSecondary),
 //                                         maxLines: 8,
 //                                         overflow: TextOverflow.ellipsis,
 //                                       ),
@@ -495,9 +439,8 @@
 
 //                                 // GALLERY
 //                                 Padding(
-//                                   padding: const EdgeInsets.symmetric(
-//                                     vertical: 8.0,
-//                                   ),
+//                                   padding:
+//                                       const EdgeInsets.symmetric(vertical: 8.0),
 //                                   child: ListView.builder(
 //                                     scrollDirection: Axis.horizontal,
 //                                     itemCount: _imagesLength(),
@@ -526,12 +469,9 @@
 //                                 // REVIEW
 //                                 Center(
 //                                   child: Text(
-//                                     "No reviews available.",
+//                                     "No Map available.",
 //                                     style: TextStyle(
-//                                       color: isDark
-//                                           ? Colors.white70
-//                                           : Colors.black87,
-//                                     ),
+//                                         color: glassColors.textSecondary),
 //                                   ),
 //                                 ),
 //                               ],
@@ -540,7 +480,7 @@
 
 //                           const SizedBox(height: 12),
 
-//                           // Developer info (glass card)
+//                           // Developer info
 //                           Padding(
 //                             padding:
 //                                 const EdgeInsets.symmetric(horizontal: 16.0),
@@ -549,22 +489,9 @@
 //                               padding: const EdgeInsets.all(12),
 //                               decoration: BoxDecoration(
 //                                 borderRadius: BorderRadius.circular(12),
-//                                 color: isDark
-//                                     ? Colors.white.withOpacity(0.03)
-//                                     : Colors.white.withOpacity(0.9),
-//                                 border: Border.all(
-//                                   color: isDark
-//                                       ? Colors.white12
-//                                       : Colors.grey.shade200,
-//                                 ),
-//                                 boxShadow: [
-//                                   if (!isDark)
-//                                     BoxShadow(
-//                                       color: Colors.black12,
-//                                       blurRadius: 8,
-//                                       offset: Offset(0, 4),
-//                                     ),
-//                                 ],
+//                                 color: glassColors.cardBackground,
+//                                 border:
+//                                     Border.all(color: glassColors.glassBorder),
 //                               ),
 //                               child: Column(
 //                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -573,23 +500,17 @@
 //                                     "Developer",
 //                                     style: TextStyle(
 //                                       fontWeight: FontWeight.bold,
-//                                       color:
-//                                           isDark ? Colors.white : Colors.black,
+//                                       color: glassColors.textPrimary,
 //                                     ),
 //                                   ),
 //                                   const SizedBox(height: 10),
 //                                   Row(
 //                                     children: [
 //                                       CircleAvatar(
-//                                         backgroundColor: isDark
-//                                             ? Colors.white12
-//                                             : Colors.grey.shade200,
-//                                         child: Icon(
-//                                           Icons.person,
-//                                           color: isDark
-//                                               ? Colors.white
-//                                               : Colors.black,
-//                                         ),
+//                                         backgroundColor:
+//                                             glassColors.cardBackground,
+//                                         child: Icon(Icons.person,
+//                                             color: glassColors.textPrimary),
 //                                       ),
 //                                       const SizedBox(width: 10),
 //                                       Expanded(
@@ -598,21 +519,15 @@
 //                                                   ?.toString() ??
 //                                               'Unknown',
 //                                           style: TextStyle(
-//                                             color: isDark
-//                                                 ? Colors.white70
-//                                                 : Colors.black87,
-//                                           ),
+//                                               color: glassColors.textSecondary),
 //                                         ),
 //                                       ),
 //                                       TextButton(
-//                                         onPressed: () {
-//                                           // view developer
-//                                         },
-//                                         child: Text(
-//                                           "View",
-//                                           style:
-//                                               TextStyle(color: kPrimaryOrange),
-//                                         ),
+//                                         onPressed: () {},
+//                                         child: Text("View",
+//                                             style: TextStyle(
+//                                                 color: Theme.of(context)
+//                                                     .primaryColor)),
 //                                       ),
 //                                     ],
 //                                   ),
@@ -623,38 +538,371 @@
 
 //                           const SizedBox(height: 14),
 
-//                           // Amenities title + chips
+//                           // Amenities
 //                           Padding(
 //                             padding:
 //                                 const EdgeInsets.symmetric(horizontal: 16.0),
 //                             child: Text(
 //                               "Amenities",
 //                               style: TextStyle(
-//                                 fontWeight: FontWeight.bold,
-//                                 fontSize: 16,
-//                                 color: isDark ? Colors.white : Colors.black87,
-//                               ),
+//                                   fontWeight: FontWeight.bold,
+//                                   fontSize: 16,
+//                                   color: glassColors.textPrimary),
 //                             ),
 //                           ),
 
 //                           Padding(
 //                             padding: const EdgeInsets.symmetric(
-//                               horizontal: 16.0,
-//                               vertical: 12,
-//                             ),
+//                                 horizontal: 16.0, vertical: 12),
 //                             child: Wrap(
 //                               spacing: 8,
 //                               runSpacing: 8,
-//                               children: _amenityChips(isDark),
+//                               children: _amenityChips(),
 //                             ),
 //                           ),
 
-//                           SizedBox(height: 140), // space for bottom booking bar
+//                           // FLOOR PLAN SECTION
+//                           Padding(
+//                             padding: const EdgeInsets.symmetric(
+//                                 horizontal: 16.0, vertical: 8),
+//                             child: Column(
+//                               crossAxisAlignment: CrossAxisAlignment.start,
+//                               children: [
+//                                 // Heading
+//                                 Text(
+//                                   "Floor Plans",
+//                                   style: TextStyle(
+//                                     fontWeight: FontWeight.bold,
+//                                     fontSize: 16,
+//                                     color: glassColors
+//                                         .textPrimary, // uses your theme
+//                                   ),
+//                                 ),
+//                                 const SizedBox(height: 8),
+
+//                                 // List of floor plans
+//                                 Column(
+//                                   children: (property?['property_floor_plan']
+//                                               as List<dynamic>? ??
+//                                           [])
+//                                       .asMap()
+//                                       .entries
+//                                       .map((entry) {
+//                                     final index = entry.key;
+//                                     final url = entry.value.toString();
+//                                     return Card(
+//                                       shape: RoundedRectangleBorder(
+//                                           borderRadius:
+//                                               BorderRadius.circular(12)),
+//                                       color: glassColors
+//                                           .chipUnselectedStart, // theme color
+
+//                                       margin: const EdgeInsets.symmetric(
+//                                           vertical: 3),
+//                                       elevation: 2,
+//                                       child: ExpansionTile(
+//                                         iconColor: Theme.of(context)
+//                                             .primaryColor, // arrow color
+//                                         collapsedIconColor:
+//                                             Theme.of(context).primaryColor,
+//                                         title: Text(
+//                                           "Map ${index + 1}",
+//                                           style: TextStyle(
+//                                             fontWeight: FontWeight.w500,
+//                                             fontSize: 14,
+//                                             color: glassColors
+//                                                 .textPrimary, // theme color
+//                                           ),
+//                                         ),
+//                                         childrenPadding:
+//                                             const EdgeInsets.symmetric(
+//                                                 horizontal: 12, vertical: 2),
+//                                         children: [
+//                                           GestureDetector(
+//                                             onTap: () {
+//                                               Navigator.push(
+//                                                 context,
+//                                                 MaterialPageRoute(
+//                                                     builder: (_) =>
+//                                                         FullScreenImageViewer(
+//                                                             imageUrl: url)),
+//                                               );
+//                                             },
+//                                             child: ClipRRect(
+//                                               borderRadius:
+//                                                   BorderRadius.circular(12),
+//                                               child: Image.network(
+//                                                 url,
+//                                                 width: double.infinity,
+//                                                 height: 180,
+//                                                 fit: BoxFit.cover,
+//                                                 loadingBuilder:
+//                                                     (context, child, progress) {
+//                                                   if (progress == null)
+//                                                     return child;
+//                                                   return Container(
+//                                                     height: 180,
+//                                                     color: glassColors
+//                                                         .chipUnselectedStart,
+//                                                     child: const Center(
+//                                                         child:
+//                                                             CircularProgressIndicator()),
+//                                                   );
+//                                                 },
+//                                                 errorBuilder: (_, __, ___) =>
+//                                                     Container(
+//                                                   height: 180,
+//                                                   color: glassColors
+//                                                       .cardBackground,
+//                                                   child: const Center(
+//                                                       child: Icon(
+//                                                           Icons.broken_image)),
+//                                                 ),
+//                                               ),
+//                                             ),
+//                                           ),
+//                                         ],
+//                                       ),
+//                                     );
+//                                   }).toList(),
+//                                 ),
+//                               ],
+//                             ),
+//                           ),
+
+//                           // BROCHURE SECTION
+//                           // Padding(
+//                           //   padding: const EdgeInsets.symmetric(
+//                           //       horizontal: 16.0, vertical: 12),
+//                           //   child: Column(
+//                           //     crossAxisAlignment: CrossAxisAlignment.start,
+//                           //     children: [
+//                           //       Text(
+//                           //         "Brochure",
+//                           //         style: TextStyle(
+//                           //           fontWeight: FontWeight.bold,
+//                           //           fontSize: 16,
+//                           //           color: glassColors.textPrimary,
+//                           //         ),
+//                           //       ),
+//                           //       const SizedBox(height: 8),
+
+//                           //       // Brochure Card / Button
+//                           //       GestureDetector(
+//                           //         onTap: () async {
+//                           //           final url = property?['property_brochure']
+//                           //               ?.toString();
+//                           //           if (url == null || url.isEmpty) {
+//                           //             Get.snackbar(
+//                           //               "No Brochure",
+//                           //               "Brochure not available for this property",
+//                           //               backgroundColor: Theme.of(context)
+//                           //                   .primaryColor
+//                           //                   .withOpacity(0.9),
+//                           //               colorText: Colors.white,
+//                           //             );
+//                           //             return;
+//                           //           }
+
+//                           //           // Download the PDF
+//                           //           await downloadAndOpenPDF(url);
+//                           //         },
+//                           //         child: Card(
+//                           //           color: glassColors.cardBackground,
+//                           //           shape: RoundedRectangleBorder(
+//                           //               borderRadius:
+//                           //                   BorderRadius.circular(12)),
+//                           //           elevation: 2,
+//                           //           child: Padding(
+//                           //             padding: const EdgeInsets.symmetric(
+//                           //                 horizontal: 16, vertical: 12),
+//                           //             child: Row(
+//                           //               children: [
+//                           //                 Icon(
+//                           //                   Icons.picture_as_pdf,
+//                           //                   size: 28,
+//                           //                   color:
+//                           //                       Theme.of(context).primaryColor,
+//                           //                 ),
+//                           //                 const SizedBox(width: 12),
+//                           //                 Expanded(
+//                           //                   child: Text(
+//                           //                     "Download Brochure",
+//                           //                     style: TextStyle(
+//                           //                         fontSize: 14,
+//                           //                         fontWeight: FontWeight.w600,
+//                           //                         color:
+//                           //                             glassColors.textPrimary),
+//                           //                   ),
+//                           //                 ),
+//                           //                 Icon(
+//                           //                   Icons.download,
+//                           //                   color:
+//                           //                       Theme.of(context).primaryColor,
+//                           //                 )
+//                           //               ],
+//                           //             ),
+//                           //           ),
+//                           //         ),
+//                           //       ),
+//                           //     ],
+//                           //   ),
+//                           // ),
+
+//                           // PREMIUM BROCHURE SECTION
+//                           Padding(
+//                             padding: const EdgeInsets.symmetric(
+//                                 horizontal: 16.0, vertical: 12),
+//                             child: Column(
+//                               crossAxisAlignment: CrossAxisAlignment.start,
+//                               children: [
+//                                 Text(
+//                                   "Brochure",
+//                                   style: TextStyle(
+//                                     fontWeight: FontWeight.bold,
+//                                     fontSize: 16,
+//                                     color: glassColors.textPrimary,
+//                                   ),
+//                                 ),
+//                                 const SizedBox(height: 12),
+
+//                                 // Premium Card
+//                                 GestureDetector(
+//                                   onTap: () async {
+//                                     final url = property?['property_brochure']
+//                                         ?.toString();
+//                                     if (url == null || url.isEmpty) {
+//                                       Get.snackbar(
+//                                         "No Brochure",
+//                                         "Brochure not available for this property",
+//                                         backgroundColor: Theme.of(context)
+//                                             .primaryColor
+//                                             .withOpacity(0.9),
+//                                         colorText: Colors.white,
+//                                       );
+//                                       return;
+//                                     }
+//                                     await downloadAndOpenPDF(url);
+//                                   },
+//                                   child: StatefulBuilder(
+//                                     builder: (context, setState) {
+//                                       bool isPressed = false;
+//                                       return Listener(
+//                                         onPointerDown: (_) =>
+//                                             setState(() => isPressed = true),
+//                                         onPointerUp: (_) =>
+//                                             setState(() => isPressed = false),
+//                                         child: AnimatedScale(
+//                                           duration:
+//                                               const Duration(milliseconds: 150),
+//                                           scale: isPressed ? 0.97 : 1.0,
+//                                           curve: Curves.easeOutBack,
+//                                           child: ClipRRect(
+//                                             borderRadius:
+//                                                 BorderRadius.circular(20),
+//                                             child: BackdropFilter(
+//                                               filter: ImageFilter.blur(
+//                                                   sigmaX: 15, sigmaY: 15),
+//                                               child: Container(
+//                                                 decoration: BoxDecoration(
+//                                                   color: glassColors
+//                                                       .glassBackground
+//                                                       .withOpacity(0.85),
+//                                                   borderRadius:
+//                                                       BorderRadius.circular(20),
+//                                                   border: Border.all(
+//                                                       color: glassColors
+//                                                           .glassBorder,
+//                                                       width: 1.2),
+//                                                   boxShadow: [
+//                                                     BoxShadow(
+//                                                       color: Theme.of(context)
+//                                                           .primaryColor
+//                                                           .withOpacity(0.15),
+//                                                       blurRadius: 20,
+//                                                       offset:
+//                                                           const Offset(0, 6),
+//                                                     )
+//                                                   ],
+//                                                 ),
+//                                                 padding:
+//                                                     const EdgeInsets.symmetric(
+//                                                         horizontal: 20,
+//                                                         vertical: 16),
+//                                                 child: Row(
+//                                                   children: [
+//                                                     // PDF Icon
+//                                                     Container(
+//                                                       padding:
+//                                                           const EdgeInsets.all(
+//                                                               12),
+//                                                       decoration: BoxDecoration(
+//                                                         shape: BoxShape.circle,
+//                                                         color: Theme.of(context)
+//                                                             .primaryColor
+//                                                             .withOpacity(0.15),
+//                                                       ),
+//                                                       child: Icon(
+//                                                         Icons.picture_as_pdf,
+//                                                         size: 28,
+//                                                         color: Theme.of(context)
+//                                                             .primaryColor,
+//                                                       ),
+//                                                     ),
+
+//                                                     const SizedBox(width: 16),
+
+//                                                     // Title
+//                                                     Expanded(
+//                                                       child: Text(
+//                                                         "Download Brochure",
+//                                                         style: TextStyle(
+//                                                           fontSize: 16,
+//                                                           fontWeight:
+//                                                               FontWeight.bold,
+//                                                           color: glassColors
+//                                                               .textPrimary,
+//                                                         ),
+//                                                       ),
+//                                                     ),
+
+//                                                     // Download arrow
+//                                                     Container(
+//                                                       padding:
+//                                                           const EdgeInsets.all(
+//                                                               10),
+//                                                       decoration: BoxDecoration(
+//                                                         color: Theme.of(context)
+//                                                             .primaryColor
+//                                                             .withOpacity(0.15),
+//                                                         shape: BoxShape.circle,
+//                                                       ),
+//                                                       child: Icon(
+//                                                         Icons.download,
+//                                                         color: Theme.of(context)
+//                                                             .primaryColor,
+//                                                       ),
+//                                                     ),
+//                                                   ],
+//                                                 ),
+//                                               ),
+//                                             ),
+//                                           ),
+//                                         ),
+//                                       );
+//                                     },
+//                                   ),
+//                                 ),
+//                               ],
+//                             ),
+//                           ),
+
+//                           const SizedBox(height: 140), // bottom bar space
 //                         ],
 //                       ),
 //                     ),
 
-//                     // BOTTOM BOOKING BAR - glass style (fixed)
+//                     // BOTTOM BOOKING BAR
 //                     Positioned(
 //                       bottom: 0,
 //                       left: 0,
@@ -663,67 +911,43 @@
 //                         top: false,
 //                         child: Padding(
 //                           padding: const EdgeInsets.symmetric(
-//                             horizontal: 12.0,
-//                             vertical: 8,
-//                           ),
+//                               horizontal: 12.0, vertical: 8),
 //                           child: ClipRRect(
 //                             borderRadius: BorderRadius.circular(14),
 //                             child: BackdropFilter(
 //                               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
 //                               child: Container(
 //                                 padding: const EdgeInsets.symmetric(
-//                                   horizontal: 16,
-//                                   vertical: 12,
-//                                 ),
+//                                     horizontal: 16, vertical: 12),
 //                                 decoration: BoxDecoration(
-//                                   color: isDark
-//                                       ? Colors.white.withOpacity(0.04)
-//                                       : Colors.white,
+//                                   color: glassColors.glassBackground,
 //                                   border: Border.all(
-//                                     color: isDark
-//                                         ? Colors.white12
-//                                         : Colors.grey.shade200,
-//                                   ),
-//                                   boxShadow: [
-//                                     BoxShadow(
-//                                       color: isDark
-//                                           ? Colors.black.withOpacity(0.6)
-//                                           : Colors.black12,
-//                                       offset: const Offset(0, -2),
-//                                       blurRadius: 8,
-//                                     ),
-//                                   ],
+//                                       color: glassColors.glassBorder),
 //                                 ),
 //                                 child: Row(
 //                                   children: [
 //                                     ElevatedButton(
 //                                       onPressed: () {
-//                                         // showDialog(
-//                                         //   context: context,
-//                                         //   builder: (_) =>
-//                                         //       _buildInquiryDialog(isDark),
-//                                         // );
 //                                         showDialog(
 //                                           context: context,
 //                                           builder: (_) => InquiryForm(
 //                                             isDark: isDark,
 //                                             propertySlug: widget.slug,
+//                                             propertyName: null,
+//                                             propertyData: null,
 //                                           ),
 //                                         );
 //                                       },
 //                                       style: ElevatedButton.styleFrom(
-//                                         backgroundColor: kPrimaryOrange,
+//                                         backgroundColor:
+//                                             Theme.of(context).primaryColor,
 //                                         shape: const StadiumBorder(),
 //                                         padding: const EdgeInsets.symmetric(
-//                                           horizontal: 20,
-//                                           vertical: 12,
-//                                         ),
-//                                         elevation: 4,
+//                                             horizontal: 20, vertical: 12),
 //                                       ),
-//                                       child: const Text(
-//                                         "INQUIRY",
-//                                         style: TextStyle(color: Colors.white),
-//                                       ),
+//                                       child: const Text("INQUIRY",
+//                                           style:
+//                                               TextStyle(color: Colors.white)),
 //                                     ),
 //                                   ],
 //                                 ),
@@ -738,10 +962,7 @@
 //     );
 //   }
 
-//   // ----------------------------
-//   // Helpers & small widgets
-//   // ----------------------------
-
+//   // ----------------- HELPERS -----------------
 //   int _imagesLength() {
 //     try {
 //       final list = property?['property_images'] as List?;
@@ -754,9 +975,8 @@
 //   String _getImageAtIndex(int idx) {
 //     try {
 //       final list = property?['property_images'] as List?;
-//       if (list == null || list.isEmpty) {
+//       if (list == null || list.isEmpty)
 //         return 'https://via.placeholder.com/600x400';
-//       }
 //       return list[idx % list.length].toString();
 //     } catch (_) {
 //       return 'https://via.placeholder.com/600x400';
@@ -774,65 +994,119 @@
 //     }
 //   }
 
-//   String _priceText() {
-//     try {
-//       final price = property?['property_price'] ?? property?['price'] ?? '';
-//       if (price == null || price.toString().isEmpty) return 'Price on request';
-//       return price.toString();
-//     } catch (_) {
-//       return 'Price on request';
-//     }
-//   }
-
-//   Widget glassCircle({required Widget child, required bool isDark}) {
-//     return ClipRRect(
-//       borderRadius: BorderRadius.circular(40),
-//       child: BackdropFilter(
-//         filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
-//         child: Container(
-//           padding: const EdgeInsets.all(2),
-//           decoration: BoxDecoration(
-//             color: isDark
-//                 ? Colors.white.withOpacity(0.06)
-//                 : Colors.white.withOpacity(0.9),
-//             borderRadius: BorderRadius.circular(40),
-//             border: Border.all(
-//               color: isDark ? Colors.white12 : Colors.grey.shade300,
+//   Widget _glassCircleIcon({
+//     required IconData icon,
+//     String? tooltip,
+//     VoidCallback? onTap,
+//   }) {
+//     return GestureDetector(
+//       onTap: onTap,
+//       child: Tooltip(
+//         message: tooltip ?? '',
+//         child: ClipRRect(
+//           borderRadius: BorderRadius.circular(40),
+//           child: BackdropFilter(
+//             filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+//             child: Container(
+//               height: 36,
+//               width: 36,
+//               alignment: Alignment.center,
+//               decoration: BoxDecoration(
+//                 color: glassColors.glassBackground,
+//                 shape: BoxShape.circle,
+//                 border: Border.all(
+//                   color: glassColors.glassBorder,
+//                 ),
+//               ),
+//               child: Icon(
+//                 icon,
+//                 size: 18,
+//                 color: glassColors.textPrimary,
+//               ),
 //             ),
-//           ),
-//           child: CircleAvatar(
-//             radius: 18,
-//             backgroundColor: Colors.transparent,
-//             child: child,
 //           ),
 //         ),
 //       ),
 //     );
 //   }
 
-//   Widget _smallTag(String title, {required bool isDark}) {
+//   Widget glassButton({
+//     required IconData icon,
+//     VoidCallback? onTap,
+//   }) {
+//     final glass = Theme.of(Get.context!).extension<GlassColors>()!;
+
+//     return StatefulBuilder(
+//       builder: (context, setState) {
+//         bool isPressed = false;
+
+//         return Listener(
+//           onPointerDown: (_) => setState(() => isPressed = true),
+//           onPointerUp: (_) => setState(() => isPressed = false),
+//           child: AnimatedScale(
+//             scale: isPressed ? 0.88 : 1.0,
+//             duration: const Duration(milliseconds: 160),
+//             curve: Curves.easeOutBack,
+//             child: GestureDetector(
+//               onTap: onTap,
+//               child: ClipRRect(
+//                 borderRadius: BorderRadius.circular(50),
+//                 child: BackdropFilter(
+//                   filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+//                   child: AnimatedContainer(
+//                     duration: const Duration(milliseconds: 250),
+//                     height: 46,
+//                     width: 46,
+//                     decoration: BoxDecoration(
+//                       shape: BoxShape.circle,
+//                       color: glass.glassBackground.withOpacity(0.55),
+//                       border: Border.all(
+//                         color: glass.glassBorder
+//                             .withOpacity(isPressed ? 0.9 : 0.6),
+//                         width: 1.2,
+//                       ),
+//                       boxShadow: [
+//                         BoxShadow(
+//                           color: Theme.of(Get.context!)
+//                               .primaryColor
+//                               .withOpacity(isPressed ? 0.25 : 0.15),
+//                           blurRadius: isPressed ? 16 : 10,
+//                           spreadRadius: 0,
+//                           offset: const Offset(0, 2),
+//                         )
+//                       ],
+//                     ),
+//                     child: Center(
+//                       child: Icon(
+//                         icon,
+//                         color: Theme.of(Get.context!).primaryColor,
+//                         size: 20,
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//             ),
+//           ),
+//         );
+//       },
+//     );
+//   }
+
+//   Widget _smallTag(String title) {
 //     return Container(
 //       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
 //       decoration: BoxDecoration(
 //         borderRadius: BorderRadius.circular(10),
-//         color: isDark
-//             ? Colors.white.withOpacity(0.06)
-//             : Colors.white.withOpacity(0.9),
-//         border: Border.all(
-//           color: isDark ? Colors.white12 : Colors.grey.shade200,
-//         ),
+//         color: glassColors.cardBackground,
+//         border: Border.all(color: glassColors.glassBorder),
 //       ),
 //       child: Row(
 //         children: [
-//           Icon(Icons.villa, size: 14, color: kPrimaryOrange),
+//           Icon(Icons.villa, size: 14, color: Theme.of(context).primaryColor),
 //           const SizedBox(width: 6),
-//           Text(
-//             title,
-//             style: TextStyle(
-//               color: isDark ? Colors.white70 : Colors.black87,
-//               fontSize: 12,
-//             ),
-//           ),
+//           Text(title,
+//               style: TextStyle(color: glassColors.textSecondary, fontSize: 12)),
 //         ],
 //       ),
 //     );
@@ -858,7 +1132,7 @@
 //     return Icons.check_circle_outline;
 //   }
 
-//   List<Widget> _amenityChips(bool isDark) {
+//   List<Widget> _amenityChips() {
 //     final List amenities = (property?['property_amenities'] as List?) ?? [];
 //     return amenities.map<Widget>((a) {
 //       final label = a?.toString() ?? '';
@@ -866,36 +1140,20 @@
 //         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
 //         decoration: BoxDecoration(
 //           borderRadius: BorderRadius.circular(14),
-//           color: isDark ? Colors.white12 : Colors.grey.shade100,
-//           border: Border.all(
-//             color: isDark ? Colors.white12 : Colors.grey.shade200,
-//           ),
-//           boxShadow: [
-//             if (!isDark)
-//               BoxShadow(
-//                 color: Colors.black12,
-//                 blurRadius: 6,
-//                 offset: Offset(0, 3),
-//               ),
-//           ],
+//           color: glassColors.cardBackground,
+//           border: Border.all(color: glassColors.glassBorder),
 //         ),
 //         child: Row(
 //           mainAxisSize: MainAxisSize.min,
 //           children: [
-//             Icon(
-//               getAmenityIcon(label),
-//               size: 14,
-//               color: isDark ? Colors.white70 : Colors.black87,
-//             ),
+//             Icon(getAmenityIcon(label),
+//                 size: 14, color: glassColors.textSecondary),
 //             const SizedBox(width: 8),
-//             Text(
-//               label,
-//               style: TextStyle(
-//                 fontSize: 12,
-//                 color: isDark ? Colors.white70 : Colors.black87,
-//                 fontWeight: FontWeight.w500,
-//               ),
-//             ),
+//             Text(label,
+//                 style: TextStyle(
+//                     fontSize: 12,
+//                     color: glassColors.textSecondary,
+//                     fontWeight: FontWeight.w500)),
 //           ],
 //         ),
 //       );
@@ -910,27 +1168,27 @@
 
 //   @override
 //   Widget build(BuildContext context) {
-//     final isDark = Get.find<ThemeController>().isDark.value;
+//     final glassColors = Theme.of(context).extension<GlassColors>()!;
 //     return Container(
 //       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
 //       decoration: BoxDecoration(
-//         color: isDark ? Colors.white.withOpacity(0.06) : Colors.grey[200],
+//         color: glassColors.cardBackground,
 //         borderRadius: BorderRadius.circular(10),
-//         border: Border.all(color: isDark ? Colors.white12 : Colors.transparent),
+//         border: Border.all(color: glassColors.glassBorder),
 //       ),
 //       child: Row(
 //         children: [
 //           Icon(
 //             Icons.check_circle_outline,
 //             size: 15.0,
-//             color: isDark ? Colors.white70 : Colors.black54,
+//             color: glassColors.textSecondary,
 //           ),
 //           const SizedBox(width: 6),
 //           Text(
 //             label,
 //             style: TextStyle(
 //               fontSize: 12.0,
-//               color: isDark ? Colors.white70 : Colors.black87,
+//               color: glassColors.textSecondary,
 //             ),
 //           ),
 //         ],
@@ -946,12 +1204,12 @@
 
 //   @override
 //   Widget build(BuildContext context) {
-//     final isDark = Get.find<ThemeController>().isDark.value;
+//     final glassColors = Theme.of(context).extension<GlassColors>()!;
 //     return Scaffold(
-//       backgroundColor: isDark ? Colors.black : Colors.white,
+//       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 //       appBar: AppBar(
-//         backgroundColor: isDark ? Colors.black : Colors.white,
-//         iconTheme: IconThemeData(color: isDark ? Colors.white : Colors.black),
+//         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+//         iconTheme: IconThemeData(color: glassColors.textPrimary),
 //         elevation: 0,
 //       ),
 //       body: Center(
@@ -963,7 +1221,99 @@
 //   }
 // }
 
+// class FloorPlanPage extends StatefulWidget {
+//   final Map<String, dynamic> property;
+//   const FloorPlanPage({required this.property, super.key});
+
+//   @override
+//   _FloorPlanPageState createState() => _FloorPlanPageState();
+// }
+
+// class _FloorPlanPageState extends State<FloorPlanPage> {
+//   int activeIndex = 0;
+//   final PageController _pageController = PageController();
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final glassColors = Theme.of(context).extension<GlassColors>()!;
+//     final List<dynamic> floorPlans =
+//         widget.property['property_floor_plan'] ?? [];
+
+//     if (floorPlans.isEmpty) {
+//       return Scaffold(
+//         appBar: AppBar(title: const Text("Floor Plan")),
+//         body: const Center(child: Text("No floor plans available.")),
+//       );
+//     }
+
+//     return Scaffold(
+//       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+//       appBar: AppBar(
+//         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+//         iconTheme: IconThemeData(color: glassColors.textPrimary),
+//         elevation: 0,
+//         title: const Text("Floor Plan"),
+//       ),
+//       body: Column(
+//         children: [
+//           Expanded(
+//             child: PageView.builder(
+//               controller: _pageController,
+//               itemCount: floorPlans.length,
+//               onPageChanged: (index) => setState(() => activeIndex = index),
+//               itemBuilder: (context, index) {
+//                 final img = floorPlans[index].toString();
+//                 return GestureDetector(
+//                   onTap: () {
+//                     Navigator.push(
+//                       context,
+//                       MaterialPageRoute(
+//                         builder: (_) => FullScreenImageViewer(imageUrl: img),
+//                       ),
+//                     );
+//                   },
+//                   child: Container(
+//                     color: glassColors.cardBackground,
+//                     child: Image.network(
+//                       img,
+//                       width: double.infinity,
+//                       fit: BoxFit.contain,
+//                       loadingBuilder: (context, child, progress) {
+//                         if (progress == null) return child;
+//                         return const Center(child: CircularProgressIndicator());
+//                       },
+//                       errorBuilder: (_, __, ___) =>
+//                           const Center(child: Icon(Icons.broken_image)),
+//                     ),
+//                   ),
+//                 );
+//               },
+//             ),
+//           ),
+
+//           // Page indicator
+//           if (floorPlans.length > 1)
+//             Padding(
+//               padding: const EdgeInsets.symmetric(vertical: 12.0),
+//               child: AnimatedSmoothIndicator(
+//                 activeIndex: activeIndex,
+//                 count: floorPlans.length,
+//                 effect: ExpandingDotsEffect(
+//                   activeDotColor: Theme.of(context).primaryColor,
+//                   dotColor: glassColors.textSecondary,
+//                   dotHeight: 8,
+//                   dotWidth: 8,
+//                 ),
+//               ),
+//             ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
 // this is my  property_detail_page.dart
+
 import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
@@ -1078,6 +1428,12 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
 
   @override
   Widget build(BuildContext context) {
+    // final isDark = themeController.isDark.value;
+    // final media = MediaQuery.of(context).size;
+
+    final glass = Theme.of(context).extension<GlassColors>()!;
+    final primary = Theme.of(context).primaryColor;
+
     final isDark = themeController.isDark.value;
     final media = MediaQuery.of(context).size;
 
@@ -1112,7 +1468,7 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                     itemBuilder: (_, index) {
                                       final img = _getImageAtIndex(index);
                                       return Container(
-                                        color: glassColors.cardBackground,
+                                        color: glass.cardBackground,
                                         child: Image.network(
                                           img,
                                           width: double.infinity,
@@ -1121,7 +1477,7 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                               (context, child, progress) {
                                             if (progress == null) return child;
                                             return Container(
-                                              color: glassColors.cardBackground,
+                                              color: glass.cardBackground,
                                               child: const Center(
                                                 child:
                                                     CircularProgressIndicator(),
@@ -1131,7 +1487,7 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                           errorBuilder:
                                               (context, error, stackTrace) {
                                             return Container(
-                                              color: glassColors.cardBackground,
+                                              color: glass.cardBackground,
                                               child: const Center(
                                                 child: Icon(Icons.broken_image),
                                               ),
@@ -1156,7 +1512,7 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                     effect: ExpandingDotsEffect(
                                       activeDotColor:
                                           Theme.of(context).primaryColor,
-                                      dotColor: glassColors.textSecondary,
+                                      dotColor: glass.textSecondary,
                                       dotHeight: 8,
                                       dotWidth: 8,
                                     ),
@@ -1240,10 +1596,10 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                       border: Border.all(
                                         color: isActive
                                             ? Theme.of(context).primaryColor
-                                            : glassColors.glassBorder,
+                                            : glass.glassBorder,
                                         width: isActive ? 2 : 1,
                                       ),
-                                      color: glassColors.cardBackground,
+                                      color: glass.cardBackground,
                                     ),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(8),
@@ -1255,7 +1611,7 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                         errorBuilder: (_, __, ___) => Container(
                                           width: 64,
                                           height: 64,
-                                          color: glassColors.cardBackground,
+                                          color: glass.cardBackground,
                                           child: const Icon(Icons.broken_image),
                                         ),
                                       ),
@@ -1282,8 +1638,8 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                     size: 18, color: kPrimaryOrange),
                                 const SizedBox(width: 6),
                                 Text(_sqftText(),
-                                    style: TextStyle(
-                                        color: glassColors.textSecondary)),
+                                    style:
+                                        TextStyle(color: glass.textSecondary)),
                               ],
                             ),
                           ),
@@ -1303,7 +1659,7 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                   style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.w700,
-                                    color: glassColors.textPrimary,
+                                    color: glass.textPrimary,
                                   ),
                                 ),
                                 const SizedBox(height: 6),
@@ -1319,7 +1675,7 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                                 ?.toString() ??
                                             '',
                                         style: TextStyle(
-                                            color: glassColors.textSecondary,
+                                            color: glass.textSecondary,
                                             fontSize: 14),
                                       ),
                                     ),
@@ -1338,15 +1694,14 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                             child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                color: glassColors.cardBackground,
-                                border:
-                                    Border.all(color: glassColors.glassBorder),
+                                color: glass.cardBackground,
+                                border: Border.all(color: glass.glassBorder),
                               ),
                               child: TabBar(
                                 controller: _tabController,
-                                labelColor: Theme.of(context).primaryColor,
-                                unselectedLabelColor: glassColors.textSecondary,
-                                indicatorColor: Theme.of(context).primaryColor,
+                                labelColor: primary,
+                                unselectedLabelColor: glass.textSecondary,
+                                indicatorColor: primary,
                                 indicatorWeight: 3,
                                 tabs: const [
                                   Tab(text: 'About'),
@@ -1385,7 +1740,7 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16,
-                                          color: glassColors.textPrimary,
+                                          color: glass.textPrimary,
                                         ),
                                       ),
                                       const SizedBox(height: 8),
@@ -1394,7 +1749,7 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                                 ?.toString() ??
                                             'No description available.',
                                         style: TextStyle(
-                                            color: glassColors.textSecondary),
+                                            color: glass.textSecondary),
                                         maxLines: 8,
                                         overflow: TextOverflow.ellipsis,
                                       ),
@@ -1435,8 +1790,8 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                 Center(
                                   child: Text(
                                     "No Map available.",
-                                    style: TextStyle(
-                                        color: glassColors.textSecondary),
+                                    style:
+                                        TextStyle(color: glass.textSecondary),
                                   ),
                                 ),
                               ],
@@ -1446,60 +1801,60 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                           const SizedBox(height: 12),
 
                           // Developer info
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 16.0),
-                            child: Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: glassColors.cardBackground,
-                                border:
-                                    Border.all(color: glassColors.glassBorder),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Developer",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: glassColors.textPrimary,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Row(
-                                    children: [
-                                      CircleAvatar(
-                                        backgroundColor:
-                                            glassColors.cardBackground,
-                                        child: Icon(Icons.person,
-                                            color: glassColors.textPrimary),
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Expanded(
-                                        child: Text(
-                                          property?['developer_name']
-                                                  ?.toString() ??
-                                              'Unknown',
-                                          style: TextStyle(
-                                              color: glassColors.textSecondary),
-                                        ),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {},
-                                        child: Text("View",
-                                            style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .primaryColor)),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                          // Padding(
+                          //   padding:
+                          //       const EdgeInsets.symmetric(horizontal: 16.0),
+                          //   child: Container(
+                          //     width: double.infinity,
+                          //     padding: const EdgeInsets.all(12),
+                          //     decoration: BoxDecoration(
+                          //       borderRadius: BorderRadius.circular(12),
+                          //       color: glass.cardBackground,
+                          //       border:
+                          //           Border.all(color: glass.glassBorder),
+                          //     ),
+                          //     child: Column(
+                          //       crossAxisAlignment: CrossAxisAlignment.start,
+                          //       children: [
+                          //         Text(
+                          //           "Developer",
+                          //           style: TextStyle(
+                          //             fontWeight: FontWeight.bold,
+                          //             color: glass.textPrimary,
+                          //           ),
+                          //         ),
+                          //         const SizedBox(height: 10),
+                          //         Row(
+                          //           children: [
+                          //             CircleAvatar(
+                          //               backgroundColor:
+                          //                   glass.cardBackground,
+                          //               child: Icon(Icons.person,
+                          //                   color: glass.textPrimary),
+                          //             ),
+                          //             const SizedBox(width: 10),
+                          //             Expanded(
+                          //               child: Text(
+                          //                 property?['developer_name']
+                          //                         ?.toString() ??
+                          //                     'Unknown',
+                          //                 style: TextStyle(
+                          //                     color: glass.textSecondary),
+                          //               ),
+                          //             ),
+                          //             TextButton(
+                          //               onPressed: () {},
+                          //               child: Text("View",
+                          //                   style: TextStyle(
+                          //                       color: Theme.of(context)
+                          //                           .primaryColor)),
+                          //             ),
+                          //           ],
+                          //         ),
+                          //       ],
+                          //     ),
+                          //   ),
+                          // ),
 
                           const SizedBox(height: 14),
 
@@ -1512,7 +1867,7 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
-                                  color: glassColors.textPrimary),
+                                  color: glass.textPrimary),
                             ),
                           ),
 
@@ -1539,8 +1894,7 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
-                                    color: glassColors
-                                        .textPrimary, // uses your theme
+                                    color: glass.textPrimary, // uses your theme
                                   ),
                                 ),
                                 const SizedBox(height: 8),
@@ -1559,15 +1913,14 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(12)),
-                                      color: glassColors
+                                      color: glass
                                           .chipUnselectedStart, // theme color
 
                                       margin: const EdgeInsets.symmetric(
                                           vertical: 3),
                                       elevation: 2,
                                       child: ExpansionTile(
-                                        iconColor: Theme.of(context)
-                                            .primaryColor, // arrow color
+                                        iconColor: primary,
                                         collapsedIconColor:
                                             Theme.of(context).primaryColor,
                                         title: Text(
@@ -1575,8 +1928,7 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                           style: TextStyle(
                                             fontWeight: FontWeight.w500,
                                             fontSize: 14,
-                                            color: glassColors
-                                                .textPrimary, // theme color
+                                            color: glass.textPrimary,
                                           ),
                                         ),
                                         childrenPadding:
@@ -1607,7 +1959,7 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                                     return child;
                                                   return Container(
                                                     height: 180,
-                                                    color: glassColors
+                                                    color: glass
                                                         .chipUnselectedStart,
                                                     child: const Center(
                                                         child:
@@ -1617,8 +1969,7 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                                 errorBuilder: (_, __, ___) =>
                                                     Container(
                                                   height: 180,
-                                                  color: glassColors
-                                                      .cardBackground,
+                                                  color: glass.cardBackground,
                                                   child: const Center(
                                                       child: Icon(
                                                           Icons.broken_image)),
@@ -1635,84 +1986,7 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                             ),
                           ),
 
-                          // BROCHURE SECTION
-                          // Padding(
-                          //   padding: const EdgeInsets.symmetric(
-                          //       horizontal: 16.0, vertical: 12),
-                          //   child: Column(
-                          //     crossAxisAlignment: CrossAxisAlignment.start,
-                          //     children: [
-                          //       Text(
-                          //         "Brochure",
-                          //         style: TextStyle(
-                          //           fontWeight: FontWeight.bold,
-                          //           fontSize: 16,
-                          //           color: glassColors.textPrimary,
-                          //         ),
-                          //       ),
-                          //       const SizedBox(height: 8),
-
-                          //       // Brochure Card / Button
-                          //       GestureDetector(
-                          //         onTap: () async {
-                          //           final url = property?['property_brochure']
-                          //               ?.toString();
-                          //           if (url == null || url.isEmpty) {
-                          //             Get.snackbar(
-                          //               "No Brochure",
-                          //               "Brochure not available for this property",
-                          //               backgroundColor: Theme.of(context)
-                          //                   .primaryColor
-                          //                   .withOpacity(0.9),
-                          //               colorText: Colors.white,
-                          //             );
-                          //             return;
-                          //           }
-
-                          //           // Download the PDF
-                          //           await downloadAndOpenPDF(url);
-                          //         },
-                          //         child: Card(
-                          //           color: glassColors.cardBackground,
-                          //           shape: RoundedRectangleBorder(
-                          //               borderRadius:
-                          //                   BorderRadius.circular(12)),
-                          //           elevation: 2,
-                          //           child: Padding(
-                          //             padding: const EdgeInsets.symmetric(
-                          //                 horizontal: 16, vertical: 12),
-                          //             child: Row(
-                          //               children: [
-                          //                 Icon(
-                          //                   Icons.picture_as_pdf,
-                          //                   size: 28,
-                          //                   color:
-                          //                       Theme.of(context).primaryColor,
-                          //                 ),
-                          //                 const SizedBox(width: 12),
-                          //                 Expanded(
-                          //                   child: Text(
-                          //                     "Download Brochure",
-                          //                     style: TextStyle(
-                          //                         fontSize: 14,
-                          //                         fontWeight: FontWeight.w600,
-                          //                         color:
-                          //                             glassColors.textPrimary),
-                          //                   ),
-                          //                 ),
-                          //                 Icon(
-                          //                   Icons.download,
-                          //                   color:
-                          //                       Theme.of(context).primaryColor,
-                          //                 )
-                          //               ],
-                          //             ),
-                          //           ),
-                          //         ),
-                          //       ),
-                          //     ],
-                          //   ),
-                          // ),
+                          // PREMIUM BROCHURE SECTION
 
                           // PREMIUM BROCHURE SECTION
                           Padding(
@@ -1726,143 +2000,139 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
-                                    color: glassColors.textPrimary,
+                                    color: glass.textPrimary,
                                   ),
                                 ),
                                 const SizedBox(height: 12),
 
-                                // Premium Card
-                                GestureDetector(
-                                  onTap: () async {
-                                    final url = property?['property_brochure']
-                                        ?.toString();
-                                    if (url == null || url.isEmpty) {
-                                      Get.snackbar(
-                                        "No Brochure",
-                                        "Brochure not available for this property",
-                                        backgroundColor: Theme.of(context)
-                                            .primaryColor
-                                            .withOpacity(0.9),
-                                        colorText: Colors.white,
-                                      );
-                                      return;
-                                    }
-                                    await downloadAndOpenPDF(url);
-                                  },
-                                  child: StatefulBuilder(
-                                    builder: (context, setState) {
-                                      bool isPressed = false;
-                                      return Listener(
-                                        onPointerDown: (_) =>
-                                            setState(() => isPressed = true),
-                                        onPointerUp: (_) =>
-                                            setState(() => isPressed = false),
-                                        child: AnimatedScale(
-                                          duration:
-                                              const Duration(milliseconds: 150),
-                                          scale: isPressed ? 0.97 : 1.0,
-                                          curve: Curves.easeOutBack,
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                            child: BackdropFilter(
-                                              filter: ImageFilter.blur(
-                                                  sigmaX: 15, sigmaY: 15),
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  color: glassColors
-                                                      .glassBackground
-                                                      .withOpacity(0.85),
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                  border: Border.all(
-                                                      color: glassColors
-                                                          .glassBorder,
-                                                      width: 1.2),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Theme.of(context)
-                                                          .primaryColor
-                                                          .withOpacity(0.15),
-                                                      blurRadius: 20,
-                                                      offset:
-                                                          const Offset(0, 6),
-                                                    )
-                                                  ],
-                                                ),
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 20,
-                                                        vertical: 16),
-                                                child: Row(
-                                                  children: [
-                                                    // PDF Icon
-                                                    Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              12),
-                                                      decoration: BoxDecoration(
-                                                        shape: BoxShape.circle,
-                                                        color: Theme.of(context)
-                                                            .primaryColor
-                                                            .withOpacity(0.15),
-                                                      ),
-                                                      child: Icon(
-                                                        Icons.picture_as_pdf,
-                                                        size: 28,
-                                                        color: Theme.of(context)
-                                                            .primaryColor,
-                                                      ),
-                                                    ),
-
-                                                    const SizedBox(width: 16),
-
-                                                    // Title
-                                                    Expanded(
-                                                      child: Text(
-                                                        "Download Brochure",
-                                                        style: TextStyle(
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: glassColors
-                                                              .textPrimary,
+                                // Check if brochure exists
+                                if (property?['property_brochure'] != null &&
+                                    property!['property_brochure']
+                                        .toString()
+                                        .isNotEmpty)
+                                  GestureDetector(
+                                    onTap: () async {
+                                      final url = property?['property_brochure']
+                                          ?.toString();
+                                      if (url == null || url.isEmpty) return;
+                                      await downloadAndOpenPDF(url);
+                                    },
+                                    child: StatefulBuilder(
+                                      builder: (context, setState) {
+                                        bool isPressed = false;
+                                        return Listener(
+                                          onPointerDown: (_) =>
+                                              setState(() => isPressed = true),
+                                          onPointerUp: (_) =>
+                                              setState(() => isPressed = false),
+                                          child: AnimatedScale(
+                                            duration: const Duration(
+                                                milliseconds: 150),
+                                            scale: isPressed ? 0.97 : 1.0,
+                                            curve: Curves.easeOutBack,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              child: BackdropFilter(
+                                                filter: ImageFilter.blur(
+                                                    sigmaX: 15, sigmaY: 15),
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    color: glass.glassBackground
+                                                        .withOpacity(0.85),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20),
+                                                    border: Border.all(
+                                                        color:
+                                                            glass.glassBorder,
+                                                        width: 1.2),
+                                                  ),
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 16),
+                                                  child: Row(
+                                                    children: [
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(12),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          shape:
+                                                              BoxShape.circle,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .primaryColor
+                                                                  .withOpacity(
+                                                                      0.15),
+                                                        ),
+                                                        child: Icon(
+                                                          Icons.picture_as_pdf,
+                                                          size: 28,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .primaryColor,
                                                         ),
                                                       ),
-                                                    ),
-
-                                                    // Download arrow
-                                                    Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              10),
-                                                      decoration: BoxDecoration(
-                                                        color: Theme.of(context)
-                                                            .primaryColor
-                                                            .withOpacity(0.15),
-                                                        shape: BoxShape.circle,
+                                                      const SizedBox(width: 16),
+                                                      Expanded(
+                                                        child: Text(
+                                                          "Download Brochure",
+                                                          style: TextStyle(
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: glass
+                                                                .textPrimary,
+                                                          ),
+                                                        ),
                                                       ),
-                                                      child: Icon(
-                                                        Icons.download,
-                                                        color: Theme.of(context)
-                                                            .primaryColor,
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(10),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .primaryColor
+                                                                  .withOpacity(
+                                                                      0.15),
+                                                          shape:
+                                                              BoxShape.circle,
+                                                        ),
+                                                        child: Icon(
+                                                          Icons.download,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .primaryColor,
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ],
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                      );
-                                    },
+                                        );
+                                      },
+                                    ),
+                                  )
+                                else
+                                  Text(
+                                    "No brochure available",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: glass.textSecondary,
+                                    ),
                                   ),
-                                ),
                               ],
                             ),
                           ),
-
-                          const SizedBox(height: 140), // bottom bar space
+                          const SizedBox(height: 140),
                         ],
                       ),
                     ),
@@ -1885,9 +2155,8 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 16, vertical: 12),
                                 decoration: BoxDecoration(
-                                  color: glassColors.glassBackground,
-                                  border: Border.all(
-                                      color: glassColors.glassBorder),
+                                  color: glass.glassBackground,
+                                  border: Border.all(color: glass.glassBorder),
                                 ),
                                 child: Row(
                                   children: [
@@ -1910,9 +2179,9 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 20, vertical: 12),
                                       ),
-                                      child: const Text("INQUIRY",
-                                          style:
-                                              TextStyle(color: Colors.white)),
+                                      child: Text("INQUIRY",
+                                          style: TextStyle(
+                                              color: glass.solidSurface)),
                                     ),
                                   ],
                                 ),
@@ -1959,6 +2228,27 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
     }
   }
 
+  IconData getAmenityIcon(String name) {
+    final lower = name.toLowerCase();
+    if (lower.contains("bed")) return Icons.bed;
+    if (lower.contains("bath")) return Icons.bathtub_outlined;
+    if (lower.contains("pool")) return Icons.pool;
+    if (lower.contains("wifi")) return Icons.wifi;
+    if (lower.contains("park") || lower.contains("parking"))
+      return Icons.local_parking;
+    if (lower.contains("gym")) return Icons.fitness_center;
+    if (lower.contains("garden")) return Icons.park;
+    if (lower.contains("pet")) return Icons.pets;
+    if (lower.contains("security")) return Icons.security;
+    if (lower.contains("lift") || lower.contains("elevator"))
+      return Icons.elevator;
+    if (lower.contains("area") ||
+        lower.contains("sqft") ||
+        lower.contains("m²")) return Icons.square_foot;
+    return Icons.check_circle_outline;
+  }
+
+// ---------------------- Glass Circle Icon ----------------------
   Widget _glassCircleIcon({
     required IconData icon,
     String? tooltip,
@@ -1995,11 +2285,13 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
     );
   }
 
+// ---------------------- Glass Button ----------------------
   Widget glassButton({
     required IconData icon,
     VoidCallback? onTap,
   }) {
     final glass = Theme.of(Get.context!).extension<GlassColors>()!;
+    final primary = Theme.of(Get.context!).primaryColor;
 
     return StatefulBuilder(
       builder: (context, setState) {
@@ -2032,11 +2324,8 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Theme.of(Get.context!)
-                              .primaryColor
-                              .withOpacity(isPressed ? 0.25 : 0.15),
+                          color: primary.withOpacity(isPressed ? 0.25 : 0.15),
                           blurRadius: isPressed ? 16 : 10,
-                          spreadRadius: 0,
                           offset: const Offset(0, 2),
                         )
                       ],
@@ -2044,7 +2333,7 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
                     child: Center(
                       child: Icon(
                         icon,
-                        color: Theme.of(Get.context!).primaryColor,
+                        color: primary,
                         size: 20,
                       ),
                     ),
@@ -2058,6 +2347,7 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
     );
   }
 
+// ---------------------- Small Tag ----------------------
   Widget _smallTag(String title) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -2070,33 +2360,16 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
         children: [
           Icon(Icons.villa, size: 14, color: Theme.of(context).primaryColor),
           const SizedBox(width: 6),
-          Text(title,
-              style: TextStyle(color: glassColors.textSecondary, fontSize: 12)),
+          Text(
+            title,
+            style: TextStyle(color: glassColors.textSecondary, fontSize: 12),
+          ),
         ],
       ),
     );
   }
 
-  IconData getAmenityIcon(String name) {
-    final lower = name.toLowerCase();
-    if (lower.contains("bed")) return Icons.bed;
-    if (lower.contains("bath")) return Icons.bathtub_outlined;
-    if (lower.contains("pool")) return Icons.pool;
-    if (lower.contains("wifi")) return Icons.wifi;
-    if (lower.contains("park") || lower.contains("parking"))
-      return Icons.local_parking;
-    if (lower.contains("gym")) return Icons.fitness_center;
-    if (lower.contains("garden")) return Icons.park;
-    if (lower.contains("pet")) return Icons.pets;
-    if (lower.contains("security")) return Icons.security;
-    if (lower.contains("lift") || lower.contains("elevator"))
-      return Icons.elevator;
-    if (lower.contains("area") ||
-        lower.contains("sqft") ||
-        lower.contains("m²")) return Icons.square_foot;
-    return Icons.check_circle_outline;
-  }
-
+// ---------------------- Amenity Chips ----------------------
   List<Widget> _amenityChips() {
     final List amenities = (property?['property_amenities'] as List?) ?? [];
     return amenities.map<Widget>((a) {
@@ -2114,11 +2387,14 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
             Icon(getAmenityIcon(label),
                 size: 14, color: glassColors.textSecondary),
             const SizedBox(width: 8),
-            Text(label,
-                style: TextStyle(
-                    fontSize: 12,
-                    color: glassColors.textSecondary,
-                    fontWeight: FontWeight.w500)),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: glassColors.textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ],
         ),
       );
@@ -2126,7 +2402,7 @@ class _PropertyDetailPageState extends State<PropertyDetailPage>
   }
 }
 
-// Tag widget (small chip used in details)
+// -------------------- TAG --------------------
 class Tag extends StatelessWidget {
   final String label;
   const Tag(this.label, {super.key});
@@ -2145,14 +2421,14 @@ class Tag extends StatelessWidget {
         children: [
           Icon(
             Icons.check_circle_outline,
-            size: 15.0,
+            size: 15,
             color: glassColors.textSecondary,
           ),
           const SizedBox(width: 6),
           Text(
             label,
             style: TextStyle(
-              fontSize: 12.0,
+              fontSize: 12,
               color: glassColors.textSecondary,
             ),
           ),
@@ -2162,7 +2438,7 @@ class Tag extends StatelessWidget {
   }
 }
 
-// Full screen image viewer
+// -------------------- FULL SCREEN IMAGE VIEWER --------------------
 class FullScreenImageViewer extends StatelessWidget {
   final String imageUrl;
   const FullScreenImageViewer({required this.imageUrl, super.key});
@@ -2179,13 +2455,27 @@ class FullScreenImageViewer extends StatelessWidget {
       ),
       body: Center(
         child: InteractiveViewer(
-          child: Image.network(imageUrl, fit: BoxFit.contain),
+          child: Image.network(
+            imageUrl,
+            fit: BoxFit.contain,
+            loadingBuilder: (context, child, progress) {
+              if (progress == null) return child;
+              return Center(
+                child: CircularProgressIndicator(
+                  color: Theme.of(context).primaryColor,
+                ),
+              );
+            },
+            errorBuilder: (_, __, ___) =>
+                Icon(Icons.broken_image, color: glassColors.textSecondary),
+          ),
         ),
       ),
     );
   }
 }
 
+// -------------------- FLOOR PLAN PAGE --------------------
 class FloorPlanPage extends StatefulWidget {
   final Map<String, dynamic> property;
   const FloorPlanPage({required this.property, super.key});
@@ -2206,8 +2496,21 @@ class _FloorPlanPageState extends State<FloorPlanPage> {
 
     if (floorPlans.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: const Text("Floor Plan")),
-        body: const Center(child: Text("No floor plans available.")),
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          iconTheme: IconThemeData(color: glassColors.textPrimary),
+          elevation: 0,
+          title: Text(
+            "Floor Plan",
+            style: TextStyle(color: glassColors.textPrimary),
+          ),
+        ),
+        body: Center(
+          child: Text(
+            "No floor plans available.",
+            style: TextStyle(color: glassColors.textSecondary),
+          ),
+        ),
       );
     }
 
@@ -2217,7 +2520,10 @@ class _FloorPlanPageState extends State<FloorPlanPage> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         iconTheme: IconThemeData(color: glassColors.textPrimary),
         elevation: 0,
-        title: const Text("Floor Plan"),
+        title: Text(
+          "Floor Plan",
+          style: TextStyle(color: glassColors.textPrimary),
+        ),
       ),
       body: Column(
         children: [
@@ -2245,10 +2551,14 @@ class _FloorPlanPageState extends State<FloorPlanPage> {
                       fit: BoxFit.contain,
                       loadingBuilder: (context, child, progress) {
                         if (progress == null) return child;
-                        return const Center(child: CircularProgressIndicator());
+                        return Center(
+                          child: CircularProgressIndicator(
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        );
                       },
-                      errorBuilder: (_, __, ___) =>
-                          const Center(child: Icon(Icons.broken_image)),
+                      errorBuilder: (_, __, ___) => Icon(Icons.broken_image,
+                          color: glassColors.textSecondary),
                     ),
                   ),
                 );
@@ -2276,6 +2586,3 @@ class _FloorPlanPageState extends State<FloorPlanPage> {
     );
   }
 }
-
-
-// and i want to added init 1. (view flow plan) 2. (view on map)  

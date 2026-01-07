@@ -857,9 +857,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:visko_rocky_flutter/controller/theme_controller.dart';
-import 'package:visko_rocky_flutter/pages/account_setting_page.dart';
+import 'package:visko_rocky_flutter/pages/Account_setting_page.dart';
 import 'package:visko_rocky_flutter/pages/purchased_properties.dart';
-import 'package:visko_rocky_flutter/pages/visited_properties.dart';
 import 'package:visko_rocky_flutter/theme/app_theme.dart';
 import '../config/colors.dart';
 
@@ -1012,12 +1011,6 @@ class DashboardPage extends StatelessWidget {
                     const SizedBox(height: 20),
 
                     // Navigation Buttons
-                    _buildNavButton(
-                      title: "Visited Property",
-                      icon: Icons.location_on,
-                      glass: glass,
-                      onTap: () => Get.to(() => VisitedPropertiesPage()),
-                    ),
                     const SizedBox(height: 12),
                     _buildNavButton(
                       title: "Purchased Property",

@@ -1023,6 +1023,8 @@ import 'package:visko_rocky_flutter/pages/my_filter_property_page.dart';
 import 'package:visko_rocky_flutter/pages/property_detail_page.dart'
     hide kPrimaryOrange;
 import 'package:visko_rocky_flutter/theme/app_theme.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
+
 import '../config/colors.dart';
 
 class HomePage extends StatefulWidget {
@@ -1057,42 +1059,60 @@ class _PinnedSearchHeader extends SliverPersistentHeaderDelegate {
   });
 
   @override
+  double get minExtent => height;
+
+  @override
+  double get maxExtent => height; // ⭐ UPDATED: extra buffer removed
+
+  @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    // Check if user has scrolled
     final bool scrolled = shrinkOffset > 5;
 
-    // Gradient colors
     final glass = Theme.of(context).extension<GlassColors>()!;
 
-    final gradientColors = [
-      glass.glassBackground,
-      glass.cardBackground,
-    ];
-
     final double progress = (shrinkOffset / height).clamp(0.0, 1.0);
-    return Container(
-      decoration: BoxDecoration(
-        // color: scrolled ? null : Colors.transparent,
-        color: glass.glassBackground.withOpacity(progress * 0.99),
-        gradient: scrolled
-            ? LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                // colors: gradientColors,
-                colors: [Colors.white, Colors.white],
-              )
-            : null,
+
+    return SizedBox.expand(
+      child: ClipRRect(
+        // ⭐ UPDATED
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(16),
+          bottomRight: Radius.circular(16),
+        ),
+        child: BackdropFilter(
+          // ⭐ UPDATED (premium glass)
+          filter: ImageFilter.blur(
+            sigmaX: scrolled ? 18 : 10,
+            sigmaY: scrolled ? 18 : 10,
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: scrolled
+                  ? glass.solidSurface // ⭐ SCROLL KE BAAD SOLID
+                  : glass.glassBackground, // ⭐ SCROLL SE PEHLE GLASS
+              //   // ⭐ UPDATED (theme-only gradient)
+              //   begin: Alignment.topCenter,
+              //   end: Alignment.bottomCenter,
+              //   // colors: [
+              //   //   glass.glassBackground.withOpacity(scrolled ? 0.92 : 0.75),
+              //   //   glass.cardBackground.withOpacity(scrolled ? 0.88 : 0.65),
+              //   // ],
+              // ),
+              border: Border(
+                bottom: BorderSide(
+                  color: glass.glassBorder
+                      .withOpacity(scrolled ? 0.6 : 0.3), // ⭐ UPDATED
+                  width: 1,
+                ),
+              ),
+            ),
+            child: child,
+          ),
+        ),
       ),
-      child: child,
     );
   }
-
-  @override
-  double get maxExtent => height;
-
-  @override
-  double get minExtent => height;
 
   @override
   bool shouldRebuild(covariant _PinnedSearchHeader oldDelegate) => true;
@@ -1309,7 +1329,7 @@ class _HomePageState extends State<HomePage> {
           body: Stack(children: [
             /// 🌈 ONE SINGLE GRADIENT BACKGROUND (FIX)
             Container(
-              height: MediaQuery.of(context).size.height * 0.38,
+              height: MediaQuery.of(context).size.height * 0.36,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(20),
@@ -1328,363 +1348,296 @@ class _HomePageState extends State<HomePage> {
             CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [
-                /// =====================================
-                /// 1. PINNED TOP BAR (LOGO SECTION)
-                /// =====================================
                 SliverPersistentHeader(
                   pinned: true,
                   delegate: _PinnedSearchHeader(
-                    height: 80 + MediaQuery.of(context).padding.top,
+                    height: 275 + MediaQuery.of(context).padding.top,
+                    isDark: themeController.isDark.value,
                     child: Container(
                       padding: EdgeInsets.only(
                         top: MediaQuery.of(context).padding.top,
                         left: 12,
                         right: 12,
                       ),
-                      alignment: Alignment.center,
-                      child: SizedBox(
-                        height: 110,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            glassCircleAvatar(),
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          /// ================= TOP BAR =================
+                          SizedBox(
+                            height: 70,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  "Indore Location",
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: glass.textSecondary,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: const [
-                                    Icon(
-                                      Icons.location_on,
-                                      size: 15,
-                                      color: kPrimaryOrange,
-                                    ),
-                                    SizedBox(width: 4),
+                                glassCircleAvatar(),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
                                     Text(
-                                      "Vijay Nagar",
+                                      "Indore Location",
                                       style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600,
+                                        fontSize: 11,
+                                        color: glass.textSecondary,
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            GestureDetector(
-                              onTap: themeController.toggleTheme,
-                              child: glassButton(
-                                icon: isDark
-                                    ? Icons.light_mode_rounded
-                                    : Icons.dark_mode_rounded,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-
-                SliverPersistentHeader(
-                  pinned: true,
-                  delegate: _PinnedSearchHeader(
-                    height: 200,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Obx(() {
-                        final isDisabled = isLoadingSearch.value ||
-                            (subcategory.value == "Residential" &&
-                                (selectedLocation.value.isEmpty ||
-                                    selectedType.value.isEmpty ||
-                                    selectedSqFt.value.isEmpty)) ||
-                            (subcategory.value == "Plot" &&
-                                (selectedLocation.value.isEmpty ||
-                                    selectedSqFt.value.isEmpty));
-
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // --- THE SEARCH BAR SECTION --- //
-                            Obx(() {
-                              final glass =
-                                  Theme.of(context).extension<GlassColors>()!;
-                              final bool isDisabled = isLoadingSearch.value ||
-                                  (subcategory.value == "Residential" &&
-                                      (selectedLocation.value.isEmpty ||
-                                          selectedType.value.isEmpty ||
-                                          selectedSqFt.value.isEmpty)) ||
-                                  (subcategory.value == "Plot" &&
-                                      (selectedLocation.value.isEmpty ||
-                                          selectedSqFt.value.isEmpty));
-
-                              return Column(
-                                children: [
-                                  /// -------------------------------
-                                  /// PREMIUM GLASS TAB SWITCHER
-                                  /// -------------------------------
-
-                                  Row(
-                                    children:
-                                        ["Residential", "Plot"].map((tab) {
-                                      final active = subcategory.value == tab;
-
-                                      return GestureDetector(
-                                        onTap: () {
-                                          subcategory.value = tab;
-                                          selectedLocation.value = "";
-                                          selectedType.value = "";
-                                          selectedSqFt.value = "";
-                                          locations.clear();
-                                          types.clear();
-                                          sqFts.clear();
-
-                                          // ⭐ CHANGED
-                                          fetchFilters(subc: tab);
-                                        },
-                                        child: AnimatedContainer(
-                                          duration:
-                                              const Duration(milliseconds: 220),
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 12, horizontal: 30),
-                                          margin:
-                                              const EdgeInsets.only(right: 8),
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.only(
-                                                topLeft: Radius.circular(20),
-                                                topRight: Radius.circular(20)),
-                                            gradient: active
-                                                ? LinearGradient(
-                                                    colors: [
-                                                      glass
-                                                          .chipSelectedGradientStart,
-                                                      glass
-                                                          .chipSelectedGradientEnd,
-                                                    ],
-                                                    begin: Alignment.topLeft,
-                                                    end: Alignment.bottomRight,
-                                                  )
-                                                : LinearGradient(
-                                                    colors: [
-                                                      glass.chipUnselectedStart,
-                                                      glass.chipUnselectedEnd
-                                                    ],
-                                                  ),
-                                            border: Border.all(
-                                              color: glass.glassBorder
-                                                  .withOpacity(
-                                                      active ? 0.9 : 0.3),
-                                              width: 1.3,
-                                            ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: glass.textPrimary
-                                                    .withOpacity(0.15),
-                                                blurRadius: 6,
-                                                offset: const Offset(0, 6),
-                                              ),
-                                            ],
+                                    const SizedBox(height: 2),
+                                    Row(
+                                      children: const [
+                                        Icon(Icons.location_on,
+                                            size: 15, color: kPrimaryOrange),
+                                        SizedBox(width: 4),
+                                        Text(
+                                          "Vijay Nagar",
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600,
                                           ),
-                                          child: Text(
-                                            tab,
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              color: active
-                                                  ? Theme.of(context)
-                                                      .colorScheme
-                                                      .onPrimary
-                                                  : glass.textSecondary,
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    }).toList(),
-                                  ),
-
-                                  /// GLASS CARD – PREMIUM LOOK
-                                  Container(
-                                    padding: const EdgeInsets.all(14),
-                                    decoration: BoxDecoration(
-                                      color: glass.cardBackground,
-                                      borderRadius: BorderRadius.only(
-                                          topRight: Radius.circular(20),
-                                          bottomLeft: Radius.circular(20),
-                                          bottomRight: Radius.circular(20)),
-                                      border: Border.all(
-                                        color: glass.glassBorder,
-                                        width: 1.2,
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: glass.textPrimary
-                                              .withOpacity(0.15),
-                                          blurRadius: 6,
-                                          offset: const Offset(0, 4),
                                         ),
                                       ],
                                     ),
-                                    child: Column(
-                                      children: [
-                                        //  make location size width big and type is size is small
-                                        /// ---------------- 1ST ROW ----------------
-                                        Row(
-                                          children: [
-                                            /// PLOT → RESIDENTIAL (STATIC)
-                                            if (subcategory.value == "Plot")
-                                              Expanded(
-                                                flex: 2,
-                                                child: buildRoundedDropdown(
-                                                  label: "Residential",
-                                                  items: const ["Residential"],
-                                                  value: "Residential",
-                                                  onChanged: (_) {},
+                                  ],
+                                ),
+                                GestureDetector(
+                                  onTap: themeController.toggleTheme,
+                                  child: glassButton(
+                                    icon: isDark
+                                        ? Icons.light_mode_rounded
+                                        : Icons.dark_mode_rounded,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          /// ================= SEARCH SECTION =================
+                          Obx(() {
+                            final isDisabled = isLoadingSearch.value ||
+                                (subcategory.value == "Residential" &&
+                                    (selectedLocation.value.isEmpty ||
+                                        selectedType.value.isEmpty ||
+                                        selectedSqFt.value.isEmpty)) ||
+                                (subcategory.value == "Plot" &&
+                                    (selectedLocation.value.isEmpty ||
+                                        selectedSqFt.value.isEmpty));
+
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                /// -------- TAB SWITCHER --------
+                                Row(
+                                  children: ["Residential", "Plot"].map((tab) {
+                                    final active = subcategory.value == tab;
+
+                                    return GestureDetector(
+                                      onTap: () {
+                                        subcategory.value = tab;
+                                        selectedLocation.value = "";
+                                        selectedType.value = "";
+                                        selectedSqFt.value = "";
+                                        locations.clear();
+                                        types.clear();
+                                        sqFts.clear();
+                                        fetchFilters(subc: tab);
+                                      },
+                                      child: AnimatedContainer(
+                                        duration:
+                                            const Duration(milliseconds: 220),
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 12, horizontal: 30),
+                                        margin: const EdgeInsets.only(right: 8),
+                                        decoration: BoxDecoration(
+                                          borderRadius: const BorderRadius.only(
+                                            topLeft: Radius.circular(20),
+                                            topRight: Radius.circular(20),
+                                          ),
+                                          gradient: active
+                                              ? LinearGradient(
+                                                  colors: [
+                                                    glass
+                                                        .chipSelectedGradientStart,
+                                                    glass
+                                                        .chipSelectedGradientEnd,
+                                                  ],
+                                                )
+                                              : LinearGradient(
+                                                  colors: [
+                                                    glass.chipUnselectedStart,
+                                                    glass.chipUnselectedEnd,
+                                                  ],
                                                 ),
-                                              ),
+                                          border: Border.all(
+                                            color: glass.glassBorder
+                                                .withOpacity(
+                                                    active ? 0.9 : 0.9),
+                                            width: 1.3,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          tab,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            color: active
+                                                ? Theme.of(context)
+                                                    .colorScheme
+                                                    .onPrimary
+                                                : glass.textSecondary,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
 
-                                            if (subcategory.value == "Plot")
-                                              const SizedBox(width: 6),
-
-                                            /// LOCATION (Both tabs)
+                                /// -------- GLASS SEARCH CARD --------
+                                Container(
+                                  padding: const EdgeInsets.all(14),
+                                  decoration: BoxDecoration(
+                                    color: glass.cardBackground,
+                                    borderRadius: const BorderRadius.only(
+                                      topRight: Radius.circular(20),
+                                      bottomLeft: Radius.circular(20),
+                                      bottomRight: Radius.circular(20),
+                                    ),
+                                    border: Border.all(
+                                      color: glass.glassBorder,
+                                      // width: 1.2,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      /// ROW 1
+                                      Row(
+                                        children: [
+                                          if (subcategory.value == "Plot")
                                             Expanded(
-                                              flex: 3,
+                                              flex: 2,
                                               child: buildRoundedDropdown(
-                                                label: "Location",
-                                                items: locations,
-                                                value: selectedLocation
-                                                        .value.isEmpty
-                                                    ? null
-                                                    : selectedLocation.value,
+                                                label: "Residential",
+                                                items: const ["Residential"],
+                                                value: "Residential",
+                                                onChanged: (_) {},
+                                              ),
+                                            ),
+                                          if (subcategory.value == "Plot")
+                                            const SizedBox(width: 6),
+                                          Expanded(
+                                            flex: 3,
+                                            child: buildRoundedDropdown(
+                                              label: "Location",
+                                              items: locations,
+                                              value:
+                                                  selectedLocation.value.isEmpty
+                                                      ? null
+                                                      : selectedLocation.value,
+                                              onChanged: (val) async {
+                                                if (val != null) {
+                                                  selectedLocation.value = val;
+                                                  selectedType.value = "";
+                                                  selectedSqFt.value = "";
+                                                  await fetchFilters(
+                                                    subc: subcategory.value,
+                                                    location: val,
+                                                  );
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+
+                                      const SizedBox(height: 6),
+
+                                      /// ROW 2
+                                      Row(
+                                        children: [
+                                          if (subcategory.value ==
+                                              "Residential")
+                                            Expanded(
+                                              flex: 2,
+                                              child: buildRoundedDropdown(
+                                                label: "Type",
+                                                items: types,
+                                                value:
+                                                    selectedType.value.isEmpty
+                                                        ? null
+                                                        : selectedType.value,
                                                 onChanged: (val) async {
                                                   if (val != null) {
-                                                    selectedLocation.value =
-                                                        val;
-                                                    selectedType.value = "";
+                                                    selectedType.value = val;
                                                     selectedSqFt.value = "";
                                                     await fetchFilters(
                                                       subc: subcategory.value,
                                                       location: selectedLocation
                                                           .value,
+                                                      type: val,
                                                     );
                                                   }
                                                 },
                                               ),
                                             ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 6),
-
-                                        /// ---------------- 2ND ROW ----------------
-                                        Row(
-                                          children: [
-                                            /// TYPE (Residential only)
-                                            if (subcategory.value ==
-                                                "Residential")
-                                              Expanded(
-                                                flex: 2,
-                                                child: buildRoundedDropdown(
-                                                  label: "Type",
-                                                  items: types,
-                                                  value:
-                                                      selectedType.value.isEmpty
-                                                          ? null
-                                                          : selectedType.value,
-                                                  onChanged: (val) async {
-                                                    if (val != null) {
-                                                      selectedType.value = val;
-                                                      selectedSqFt.value = "";
-                                                      await fetchFilters(
-                                                        subc: subcategory.value,
-                                                        location:
-                                                            selectedLocation
-                                                                .value,
-                                                        type:
-                                                            selectedType.value,
-                                                      );
-                                                    }
-                                                  },
-                                                ),
-                                              ),
-
-                                            if (subcategory.value ==
-                                                "Residential")
-                                              const SizedBox(width: 6),
-
-                                            /// AREA SIZE (Both tabs)
-                                            SizedBox(
-                                              width: 140,
-                                              child: buildRoundedDropdown(
-                                                label: "Area Size (sq. ft.)",
-                                                items: sqFts,
-                                                value:
-                                                    selectedSqFt.value.isEmpty
-                                                        ? null
-                                                        : selectedSqFt.value,
-                                                onChanged: (val) {
-                                                  if (val != null)
-                                                    selectedSqFt.value = val;
-                                                },
-                                              ),
-                                            ),
-
+                                          if (subcategory.value ==
+                                              "Residential")
                                             const SizedBox(width: 6),
-
-                                            /// SEARCH BUTTON
-                                            SizedBox(
-                                              height: 50,
-                                              child: ElevatedButton(
-                                                onPressed: isDisabled
-                                                    ? null
-                                                    : handleSearch,
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor:
-                                                      Theme.of(context)
-                                                          .primaryColor,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            16),
-                                                  ),
-                                                  elevation: 6,
-                                                ),
-                                                child: Obx(() {
-                                                  if (isLoadingSearch.value) {
-                                                    return const SizedBox(
-                                                      width: 20,
-                                                      height: 20,
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                              color:
-                                                                  Colors.white),
-                                                    );
-                                                  }
-                                                  return const Icon(
-                                                      Icons.search,
-                                                      color: Colors.white);
-                                                }),
-                                              ),
+                                          SizedBox(
+                                            width: 140,
+                                            child: buildRoundedDropdown(
+                                              label: "Area Size",
+                                              items: sqFts,
+                                              value: selectedSqFt.value.isEmpty
+                                                  ? null
+                                                  : selectedSqFt.value,
+                                              onChanged: (val) {
+                                                if (val != null) {
+                                                  selectedSqFt.value = val;
+                                                }
+                                              },
                                             ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          SizedBox(
+                                            height: 50,
+                                            child: ElevatedButton(
+                                              onPressed: isDisabled
+                                                  ? null
+                                                  : handleSearch,
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    Theme.of(context)
+                                                        .primaryColor,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
+                                                ),
+                                                elevation: 6,
+                                              ),
+                                              child: Obx(() {
+                                                if (isLoadingSearch.value) {
+                                                  return const SizedBox(
+                                                    width: 20,
+                                                    height: 20,
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                            color:
+                                                                Colors.white),
+                                                  );
+                                                }
+                                                return const Icon(Icons.search,
+                                                    color: Colors.white);
+                                              }),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              );
-                            }),
-                          ],
-                        );
-                      }),
+                                ),
+                              ],
+                            );
+                          }),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -1700,6 +1653,98 @@ class _HomePageState extends State<HomePage> {
                         /// 🔁 YOUR EXISTING CONTENT
                         // ⭐ NEW: Developer Card Section Using Component
                         // ---------------------------------------------------------
+                        // SizedBox(
+                        //   height: 250,
+                        //   child: Row(
+                        //     children: [
+                        //       Container(
+                        //         width: 64,
+                        //         height: 250,
+                        //         alignment: Alignment.center,
+                        //         decoration: BoxDecoration(
+                        //           borderRadius: BorderRadius.circular(20),
+                        //           gradient: LinearGradient(
+                        //             begin: Alignment.topCenter,
+                        //             end: Alignment.bottomCenter,
+                        //             colors: [
+                        //               glass.cardBackground.withOpacity(0.80),
+                        //               glass.cardBackground.withOpacity(0.65),
+                        //               glass.cardBackground.withOpacity(0.80),
+                        //             ],
+                        //           ),
+                        //           border: Border.all(
+                        //             color: glass.glassBorder,
+                        //             width: 1.3,
+                        //           ),
+                        //           boxShadow: [
+                        //             BoxShadow(
+                        //               color: Theme.of(context).brightness ==
+                        //                       Brightness.dark
+                        //                   ? Colors.black.withOpacity(0.4)
+                        //                   : kPrimaryOrange.withOpacity(0.25),
+                        //               blurRadius: 20,
+                        //               offset: const Offset(0, 6),
+                        //             ),
+                        //           ],
+                        //         ),
+                        //         child: RotatedBox(
+                        //           quarterTurns: 3,
+                        //           child: Text(
+                        //             "DEVELOPERS",
+                        //             style: TextStyle(
+                        //               fontSize: 19,
+                        //               fontWeight: FontWeight.w900,
+                        //               foreground: Paint()
+                        //                 ..shader = LinearGradient(
+                        //                   colors: [
+                        //                     kPrimaryOrange,
+                        //                     kPrimaryOrange.withOpacity(0.7)
+                        //                   ],
+                        //                 ).createShader(
+                        //                     const Rect.fromLTWH(0, 0, 200, 60)),
+                        //               letterSpacing: 2,
+                        //             ),
+                        //           ),
+                        //         ),
+                        //       ),
+
+                        //       const SizedBox(width: 4),
+
+                        //       // ⭐ USE COMPONENT HERE
+                        //       Expanded(
+                        //         child: Obx(() {
+                        //           if (controller.developers.isEmpty) {
+                        //             return const Center(
+                        //                 child: CircularProgressIndicator());
+                        //           }
+
+                        //           return PageView.builder(
+                        //             controller: devPageController,
+                        //             padEnds: false,
+                        //             itemCount: controller.developers.length,
+                        //             onPageChanged: controller.setActiveIndex,
+                        //             itemBuilder: (context, index) {
+                        //               final dev = controller.developers[index];
+
+                        //               return DeveloperCard(
+                        //                 dev: dev,
+                        //                 onTap: () {
+                        //                   // navigate to developer properties page (existing)
+                        //                   Get.toNamed('/developer-properties',
+                        //                       arguments: {
+                        //                         'slug':
+                        //                             dev['developer_slug'] ?? "",
+                        //                       });
+                        //                 },
+                        //               );
+                        //             },
+                        //           );
+                        //         }),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
+
                         SizedBox(
                           height: 250,
                           child: Row(
@@ -1728,7 +1773,9 @@ class _HomePageState extends State<HomePage> {
                                       color: Theme.of(context).brightness ==
                                               Brightness.dark
                                           ? Colors.black.withOpacity(0.4)
-                                          : kPrimaryOrange.withOpacity(0.25),
+                                          : Theme.of(context)
+                                              .primaryColor
+                                              .withOpacity(0.25),
                                       blurRadius: 20,
                                       offset: const Offset(0, 6),
                                     ),
@@ -1744,8 +1791,10 @@ class _HomePageState extends State<HomePage> {
                                       foreground: Paint()
                                         ..shader = LinearGradient(
                                           colors: [
-                                            kPrimaryOrange,
-                                            kPrimaryOrange.withOpacity(0.7)
+                                            Theme.of(context).primaryColor,
+                                            Theme.of(context)
+                                                .primaryColor
+                                                .withOpacity(0.7)
                                           ],
                                         ).createShader(
                                             const Rect.fromLTWH(0, 0, 200, 60)),
@@ -1897,6 +1946,7 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                               );
                                             },
+                                            image: null,
                                           ),
                                         );
                                       }).toList(),
@@ -2062,82 +2112,94 @@ Widget buildRoundedDropdown({
   required String? value,
   required Function(String?) onChanged,
 }) {
-  final glass = Get.context!.theme.extension<GlassColors>()!;
+  final context = Get.context!;
+  final glass = context.theme.extension<GlassColors>()!;
 
-  // FIX 1 → Remove duplicates
   final safeItems = items.toSet().toList();
-
-  // FIX 2 → Only set value if it exists in the list
   final safeValue = (value != null && safeItems.contains(value)) ? value : null;
-  return DropdownButtonFormField<String>(
-    menuMaxHeight: 48.0 * 4,
-    value: safeValue,
-    decoration: InputDecoration(
-      labelText: label,
-      labelStyle: TextStyle(
-        fontSize: 13,
-        color: glass.textSecondary,
-        fontWeight: FontWeight.w500,
-      ),
-      filled: true,
-      fillColor: glass.glassBackground,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
 
-      // 🔥 SAME BORDER EVERY STATE
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: BorderSide(
-          color: glass.glassBorder,
-          width: 1.2,
-        ),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: BorderSide(
-          color: glass.glassBorder,
-          width: 1.2,
-        ),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: BorderSide(
-          color: glass.glassBorder, // ✅ NO THEME COLOR OVERRIDE
-          width: 1.4,
-        ),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: BorderSide(
-          color: glass.glassBorder,
-          width: 1.2,
-        ),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: BorderSide(
-          color: glass.glassBorder,
-          width: 1.4,
-        ),
-      ),
-    ),
-    style: TextStyle(
-      fontSize: 14,
-      color: glass.textPrimary,
-      fontWeight: FontWeight.w500,
-    ),
-    dropdownColor: glass.cardBackground.withOpacity(0.85),
-    items: safeItems
-        .map((v) => DropdownMenuItem(
-              value: v,
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      DropdownButtonHideUnderline(
+        child: DropdownButton2<String>(
+          isExpanded: true,
+          value: safeValue,
+
+          hint: Text(
+            " $label",
+            style: TextStyle(
+              fontSize: 14,
+              color: glass.textSecondary,
+            ),
+          ),
+
+          items: safeItems.map((item) {
+            return DropdownMenuItem<String>(
+              value: item,
               child: Text(
-                v,
+                item,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 14,
                   color: glass.textPrimary,
                 ),
               ),
-            ))
-        .toList(),
-    onChanged: onChanged,
+            );
+          }).toList(),
+
+          onChanged: onChanged,
+
+          /// 🔘 BUTTON (INPUT FIELD)
+          buttonStyleData: ButtonStyleData(
+            height: 50,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: glass.glassBackground,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: glass.glassBorder,
+                width: 1.2,
+              ),
+            ),
+          ),
+
+          /// ⬇️ DROPDOWN MENU
+          dropdownStyleData: DropdownStyleData(
+            elevation: 0,
+            maxHeight: 48 * 4, // ⭐ ONLY 4 ITEMS
+            decoration: BoxDecoration(
+              // color: glass.cardBackground.withOpacity(0.95),
+              color: glass.solidSurface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: glass.glassBorder,
+                width: 1.2,
+              ),
+            ),
+            scrollbarTheme: ScrollbarThemeData(
+              thumbColor:
+                  MaterialStateProperty.all(Theme.of(context).primaryColor),
+              thickness: MaterialStateProperty.all(5),
+              radius: const Radius.circular(10),
+              thumbVisibility: MaterialStateProperty.all(true),
+            ),
+          ),
+
+          /// 📏 ITEM SIZE
+          menuItemStyleData: const MenuItemStyleData(
+            height: 48,
+            padding: EdgeInsets.symmetric(horizontal: 12),
+          ),
+
+          /// ⬇️ ICON
+          iconStyleData: IconStyleData(
+            icon: const Icon(Icons.keyboard_arrow_down_rounded),
+            iconSize: 22,
+            iconEnabledColor: glass.textSecondary,
+          ),
+        ),
+      ),
+    ],
   );
 }

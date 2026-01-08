@@ -279,7 +279,6 @@ class _PropertyLocationPageState extends State<PropertyLocationPage> {
                                   onTap: () {
                                     Get.to(() => PropertyDetailPage(
                                           slug: item['property_slug'],
-                                          property: null,
                                         ));
                                   },
                                   image: null,

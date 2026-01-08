@@ -338,7 +338,6 @@ class _HomePropertyCardState extends State<HomePropertyCard>
                               showDialog(
                                 context: context,
                                 builder: (_) => InquiryForm(
-                                  isDark: widget.isDark,
                                   propertySlug: property['slug'] ?? "",
                                   propertyName: null,
                                   propertyData: null,
@@ -441,17 +440,17 @@ class _HomePropertyCardState extends State<HomePropertyCard>
                             );
                           }),
 
-                          const SizedBox(width: 6),
-                          GestureDetector(
-                            onTap: () => Share.share("🏡 $title\n📍 $city\n🔗"),
-                            child: _glassCircleIcon(
-                              icon: Icons.share,
-                              glass: glass,
-                              tooltip: "Share",
-                              onTap: () => Share.share(
-                                  "🏡 $title\n📍 $city\n🔗 ${property['slug'] ?? ''}"),
-                            ),
-                          ),
+                          // const SizedBox(width: 6),
+                          // GestureDetector(
+                          //   onTap: () => Share.share("🏡 $title\n📍 $city\n🔗"),
+                          //   child: _glassCircleIcon(
+                          //     icon: Icons.share,
+                          //     glass: glass,
+                          //     tooltip: "Share",
+                          //     onTap: () => Share.share(
+                          //         "🏡 $title\n📍 $city\n🔗 ${property['slug'] ?? ''}"),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ],

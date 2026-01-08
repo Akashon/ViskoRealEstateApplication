@@ -1411,83 +1411,57 @@ class _HomePageState extends State<HomePage> {
                           const SizedBox(height: 10),
 
                           /// ================= SEARCH SECTION =================
+                          /// ================= SEARCH SECTION =================
                           Obx(() {
                             final isDisabled = isLoadingSearch.value ||
-                                (subcategory.value == "Residential" &&
-                                    (selectedLocation.value.isEmpty ||
-                                        selectedType.value.isEmpty ||
-                                        selectedSqFt.value.isEmpty)) ||
-                                (subcategory.value == "Plot" &&
-                                    (selectedLocation.value.isEmpty ||
-                                        selectedSqFt.value.isEmpty));
+                                (selectedLocation.value.isEmpty ||
+                                    selectedType.value.isEmpty ||
+                                    selectedSqFt.value.isEmpty);
 
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                /// -------- TAB SWITCHER --------
+                                /// -------- TAB SWITCHER (Residential only) --------
                                 Row(
-                                  children: ["Residential", "Plot"].map((tab) {
-                                    final active = subcategory.value == tab;
-
-                                    return GestureDetector(
-                                      onTap: () {
-                                        subcategory.value = tab;
-                                        selectedLocation.value = "";
-                                        selectedType.value = "";
-                                        selectedSqFt.value = "";
-                                        locations.clear();
-                                        types.clear();
-                                        sqFts.clear();
-                                        fetchFilters(subc: tab);
-                                      },
+                                  children: [
+                                    Expanded(
                                       child: AnimatedContainer(
                                         duration:
                                             const Duration(milliseconds: 220),
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 12, horizontal: 30),
-                                        margin: const EdgeInsets.only(right: 8),
+                                        // margin: const EdgeInsets.only(right: 8),
                                         decoration: BoxDecoration(
                                           borderRadius: const BorderRadius.only(
                                             topLeft: Radius.circular(20),
                                             topRight: Radius.circular(20),
                                           ),
-                                          gradient: active
-                                              ? LinearGradient(
-                                                  colors: [
-                                                    glass
-                                                        .chipSelectedGradientStart,
-                                                    glass
-                                                        .chipSelectedGradientEnd,
-                                                  ],
-                                                )
-                                              : LinearGradient(
-                                                  colors: [
-                                                    glass.chipUnselectedStart,
-                                                    glass.chipUnselectedEnd,
-                                                  ],
-                                                ),
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              glass.chipSelectedGradientStart,
+                                              glass.chipSelectedGradientEnd,
+                                            ],
+                                          ),
                                           border: Border.all(
                                             color: glass.glassBorder
-                                                .withOpacity(
-                                                    active ? 0.9 : 0.9),
+                                                .withOpacity(0.9),
                                             width: 1.3,
                                           ),
                                         ),
                                         child: Text(
-                                          tab,
+                                          "Residential",
+                                          textAlign: TextAlign.center,
                                           style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w600,
-                                            color: active
-                                                ? Theme.of(context)
-                                                    .colorScheme
-                                                    .onPrimary
-                                                : glass.textSecondary,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onPrimary,
                                           ),
                                         ),
                                       ),
-                                    );
-                                  }).toList(),
+                                    ),
+                                  ],
                                 ),
 
                                 /// -------- GLASS SEARCH CARD --------
@@ -1496,32 +1470,18 @@ class _HomePageState extends State<HomePage> {
                                   decoration: BoxDecoration(
                                     color: glass.cardBackground,
                                     borderRadius: const BorderRadius.only(
-                                      topRight: Radius.circular(20),
                                       bottomLeft: Radius.circular(20),
                                       bottomRight: Radius.circular(20),
                                     ),
                                     border: Border.all(
                                       color: glass.glassBorder,
-                                      // width: 1.2,
                                     ),
                                   ),
                                   child: Column(
                                     children: [
-                                      /// ROW 1
+                                      /// ROW 1 - Location Dropdown
                                       Row(
                                         children: [
-                                          if (subcategory.value == "Plot")
-                                            Expanded(
-                                              flex: 2,
-                                              child: buildRoundedDropdown(
-                                                label: "Residential",
-                                                items: const ["Residential"],
-                                                value: "Residential",
-                                                onChanged: (_) {},
-                                              ),
-                                            ),
-                                          if (subcategory.value == "Plot")
-                                            const SizedBox(width: 6),
                                           Expanded(
                                             flex: 3,
                                             child: buildRoundedDropdown(
@@ -1537,7 +1497,7 @@ class _HomePageState extends State<HomePage> {
                                                   selectedType.value = "";
                                                   selectedSqFt.value = "";
                                                   await fetchFilters(
-                                                    subc: subcategory.value,
+                                                    subc: "Residential",
                                                     location: val,
                                                   );
                                                 }
@@ -1549,37 +1509,32 @@ class _HomePageState extends State<HomePage> {
 
                                       const SizedBox(height: 6),
 
-                                      /// ROW 2
+                                      /// ROW 2 - Type & Area Size
                                       Row(
                                         children: [
-                                          if (subcategory.value ==
-                                              "Residential")
-                                            Expanded(
-                                              flex: 2,
-                                              child: buildRoundedDropdown(
-                                                label: "Type",
-                                                items: types,
-                                                value:
-                                                    selectedType.value.isEmpty
-                                                        ? null
-                                                        : selectedType.value,
-                                                onChanged: (val) async {
-                                                  if (val != null) {
-                                                    selectedType.value = val;
-                                                    selectedSqFt.value = "";
-                                                    await fetchFilters(
-                                                      subc: subcategory.value,
-                                                      location: selectedLocation
-                                                          .value,
-                                                      type: val,
-                                                    );
-                                                  }
-                                                },
-                                              ),
+                                          Expanded(
+                                            flex: 2,
+                                            child: buildRoundedDropdown(
+                                              label: "Type",
+                                              items: types,
+                                              value: selectedType.value.isEmpty
+                                                  ? null
+                                                  : selectedType.value,
+                                              onChanged: (val) async {
+                                                if (val != null) {
+                                                  selectedType.value = val;
+                                                  selectedSqFt.value = "";
+                                                  await fetchFilters(
+                                                    subc: "Residential",
+                                                    location:
+                                                        selectedLocation.value,
+                                                    type: val,
+                                                  );
+                                                }
+                                              },
                                             ),
-                                          if (subcategory.value ==
-                                              "Residential")
-                                            const SizedBox(width: 6),
+                                          ),
+                                          const SizedBox(width: 6),
                                           SizedBox(
                                             width: 140,
                                             child: buildRoundedDropdown(
@@ -1589,9 +1544,8 @@ class _HomePageState extends State<HomePage> {
                                                   ? null
                                                   : selectedSqFt.value,
                                               onChanged: (val) {
-                                                if (val != null) {
+                                                if (val != null)
                                                   selectedSqFt.value = val;
-                                                }
                                               },
                                             ),
                                           ),
@@ -1636,6 +1590,233 @@ class _HomePageState extends State<HomePage> {
                               ],
                             );
                           }),
+
+                          // Obx(() {
+                          //   final isDisabled = isLoadingSearch.value ||
+                          //       (subcategory.value == "Residential" &&
+                          //           (selectedLocation.value.isEmpty ||
+                          //               selectedType.value.isEmpty ||
+                          //               selectedSqFt.value.isEmpty)) ||
+                          //       (subcategory.value == "Plot" &&
+                          //           (selectedLocation.value.isEmpty ||
+                          //               selectedSqFt.value.isEmpty));
+
+                          //   return Column(
+                          //     crossAxisAlignment: CrossAxisAlignment.start,
+                          //     children: [
+                          //       /// -------- TAB SWITCHER --------
+                          //       Row(
+                          //         children: ["Residential", "Plot"].map((tab) {
+                          //           final active = subcategory.value == tab;
+
+                          //           return GestureDetector(
+                          //             onTap: () {
+                          //               subcategory.value = tab;
+                          //               selectedLocation.value = "";
+                          //               selectedType.value = "";
+                          //               selectedSqFt.value = "";
+                          //               locations.clear();
+                          //               types.clear();
+                          //               sqFts.clear();
+                          //               fetchFilters(subc: tab);
+                          //             },
+                          //             child: AnimatedContainer(
+                          //               duration:
+                          //                   const Duration(milliseconds: 220),
+                          //               padding: const EdgeInsets.symmetric(
+                          //                   vertical: 12, horizontal: 30),
+                          //               margin: const EdgeInsets.only(right: 8),
+                          //               decoration: BoxDecoration(
+                          //                 borderRadius: const BorderRadius.only(
+                          //                   topLeft: Radius.circular(20),
+                          //                   topRight: Radius.circular(20),
+                          //                 ),
+                          //                 gradient: active
+                          //                     ? LinearGradient(
+                          //                         colors: [
+                          //                           glass
+                          //                               .chipSelectedGradientStart,
+                          //                           glass
+                          //                               .chipSelectedGradientEnd,
+                          //                         ],
+                          //                       )
+                          //                     : LinearGradient(
+                          //                         colors: [
+                          //                           glass.chipUnselectedStart,
+                          //                           glass.chipUnselectedEnd,
+                          //                         ],
+                          //                       ),
+                          //                 border: Border.all(
+                          //                   color: glass.glassBorder
+                          //                       .withOpacity(
+                          //                           active ? 0.9 : 0.9),
+                          //                   width: 1.3,
+                          //                 ),
+                          //               ),
+                          //               child: Text(
+                          //                 tab,
+                          //                 style: TextStyle(
+                          //                   fontSize: 14,
+                          //                   fontWeight: FontWeight.w600,
+                          //                   color: active
+                          //                       ? Theme.of(context)
+                          //                           .colorScheme
+                          //                           .onPrimary
+                          //                       : glass.textSecondary,
+                          //                 ),
+                          //               ),
+                          //             ),
+                          //           );
+                          //         }).toList(),
+                          //       ),
+
+                          //       /// -------- GLASS SEARCH CARD --------
+                          //       Container(
+                          //         padding: const EdgeInsets.all(14),
+                          //         decoration: BoxDecoration(
+                          //           color: glass.cardBackground,
+                          //           borderRadius: const BorderRadius.only(
+                          //             topRight: Radius.circular(20),
+                          //             bottomLeft: Radius.circular(20),
+                          //             bottomRight: Radius.circular(20),
+                          //           ),
+                          //           border: Border.all(
+                          //             color: glass.glassBorder,
+                          //             // width: 1.2,
+                          //           ),
+                          //         ),
+                          //         child: Column(
+                          //           children: [
+                          //             /// ROW 1
+                          //             Row(
+                          //               children: [
+                          //                 if (subcategory.value == "Plot")
+                          //                   Expanded(
+                          //                     flex: 2,
+                          //                     child: buildRoundedDropdown(
+                          //                       label: "Residential",
+                          //                       items: const ["Residential"],
+                          //                       value: "Residential",
+                          //                       onChanged: (_) {},
+                          //                     ),
+                          //                   ),
+                          //                 if (subcategory.value == "Plot")
+                          //                   const SizedBox(width: 6),
+                          //                 Expanded(
+                          //                   flex: 3,
+                          //                   child: buildRoundedDropdown(
+                          //                     label: "Location",
+                          //                     items: locations,
+                          //                     value:
+                          //                         selectedLocation.value.isEmpty
+                          //                             ? null
+                          //                             : selectedLocation.value,
+                          //                     onChanged: (val) async {
+                          //                       if (val != null) {
+                          //                         selectedLocation.value = val;
+                          //                         selectedType.value = "";
+                          //                         selectedSqFt.value = "";
+                          //                         await fetchFilters(
+                          //                           subc: subcategory.value,
+                          //                           location: val,
+                          //                         );
+                          //                       }
+                          //                     },
+                          //                   ),
+                          //                 ),
+                          //               ],
+                          //             ),
+
+                          //             const SizedBox(height: 6),
+
+                          //             /// ROW 2
+                          //             Row(
+                          //               children: [
+                          //                 if (subcategory.value ==
+                          //                     "Residential")
+                          //                   Expanded(
+                          //                     flex: 2,
+                          //                     child: buildRoundedDropdown(
+                          //                       label: "Type",
+                          //                       items: types,
+                          //                       value:
+                          //                           selectedType.value.isEmpty
+                          //                               ? null
+                          //                               : selectedType.value,
+                          //                       onChanged: (val) async {
+                          //                         if (val != null) {
+                          //                           selectedType.value = val;
+                          //                           selectedSqFt.value = "";
+                          //                           await fetchFilters(
+                          //                             subc: subcategory.value,
+                          //                             location: selectedLocation
+                          //                                 .value,
+                          //                             type: val,
+                          //                           );
+                          //                         }
+                          //                       },
+                          //                     ),
+                          //                   ),
+                          //                 if (subcategory.value ==
+                          //                     "Residential")
+                          //                   const SizedBox(width: 6),
+                          //                 SizedBox(
+                          //                   width: 140,
+                          //                   child: buildRoundedDropdown(
+                          //                     label: "Area Size",
+                          //                     items: sqFts,
+                          //                     value: selectedSqFt.value.isEmpty
+                          //                         ? null
+                          //                         : selectedSqFt.value,
+                          //                     onChanged: (val) {
+                          //                       if (val != null) {
+                          //                         selectedSqFt.value = val;
+                          //                       }
+                          //                     },
+                          //                   ),
+                          //                 ),
+                          //                 const SizedBox(width: 6),
+                          //                 SizedBox(
+                          //                   height: 50,
+                          //                   child: ElevatedButton(
+                          //                     onPressed: isDisabled
+                          //                         ? null
+                          //                         : handleSearch,
+                          //                     style: ElevatedButton.styleFrom(
+                          //                       backgroundColor:
+                          //                           Theme.of(context)
+                          //                               .primaryColor,
+                          //                       shape: RoundedRectangleBorder(
+                          //                         borderRadius:
+                          //                             BorderRadius.circular(16),
+                          //                       ),
+                          //                       elevation: 6,
+                          //                     ),
+                          //                     child: Obx(() {
+                          //                       if (isLoadingSearch.value) {
+                          //                         return const SizedBox(
+                          //                           width: 20,
+                          //                           height: 20,
+                          //                           child:
+                          //                               CircularProgressIndicator(
+                          //                                   color:
+                          //                                       Colors.white),
+                          //                         );
+                          //                       }
+                          //                       return const Icon(Icons.search,
+                          //                           color: Colors.white);
+                          //                     }),
+                          //                   ),
+                          //                 ),
+                          //               ],
+                          //             ),
+                          //           ],
+                          //         ),
+                          //       ),
+                          //     ],
+                          //   );
+
+                          // }),
                         ],
                       ),
                     ),
@@ -1650,101 +1831,6 @@ class _HomePageState extends State<HomePage> {
                   sliver: SliverList(
                     delegate: SliverChildListDelegate(
                       [
-                        /// 🔁 YOUR EXISTING CONTENT
-                        // ⭐ NEW: Developer Card Section Using Component
-                        // ---------------------------------------------------------
-                        // SizedBox(
-                        //   height: 250,
-                        //   child: Row(
-                        //     children: [
-                        //       Container(
-                        //         width: 64,
-                        //         height: 250,
-                        //         alignment: Alignment.center,
-                        //         decoration: BoxDecoration(
-                        //           borderRadius: BorderRadius.circular(20),
-                        //           gradient: LinearGradient(
-                        //             begin: Alignment.topCenter,
-                        //             end: Alignment.bottomCenter,
-                        //             colors: [
-                        //               glass.cardBackground.withOpacity(0.80),
-                        //               glass.cardBackground.withOpacity(0.65),
-                        //               glass.cardBackground.withOpacity(0.80),
-                        //             ],
-                        //           ),
-                        //           border: Border.all(
-                        //             color: glass.glassBorder,
-                        //             width: 1.3,
-                        //           ),
-                        //           boxShadow: [
-                        //             BoxShadow(
-                        //               color: Theme.of(context).brightness ==
-                        //                       Brightness.dark
-                        //                   ? Colors.black.withOpacity(0.4)
-                        //                   : kPrimaryOrange.withOpacity(0.25),
-                        //               blurRadius: 20,
-                        //               offset: const Offset(0, 6),
-                        //             ),
-                        //           ],
-                        //         ),
-                        //         child: RotatedBox(
-                        //           quarterTurns: 3,
-                        //           child: Text(
-                        //             "DEVELOPERS",
-                        //             style: TextStyle(
-                        //               fontSize: 19,
-                        //               fontWeight: FontWeight.w900,
-                        //               foreground: Paint()
-                        //                 ..shader = LinearGradient(
-                        //                   colors: [
-                        //                     kPrimaryOrange,
-                        //                     kPrimaryOrange.withOpacity(0.7)
-                        //                   ],
-                        //                 ).createShader(
-                        //                     const Rect.fromLTWH(0, 0, 200, 60)),
-                        //               letterSpacing: 2,
-                        //             ),
-                        //           ),
-                        //         ),
-                        //       ),
-
-                        //       const SizedBox(width: 4),
-
-                        //       // ⭐ USE COMPONENT HERE
-                        //       Expanded(
-                        //         child: Obx(() {
-                        //           if (controller.developers.isEmpty) {
-                        //             return const Center(
-                        //                 child: CircularProgressIndicator());
-                        //           }
-
-                        //           return PageView.builder(
-                        //             controller: devPageController,
-                        //             padEnds: false,
-                        //             itemCount: controller.developers.length,
-                        //             onPageChanged: controller.setActiveIndex,
-                        //             itemBuilder: (context, index) {
-                        //               final dev = controller.developers[index];
-
-                        //               return DeveloperCard(
-                        //                 dev: dev,
-                        //                 onTap: () {
-                        //                   // navigate to developer properties page (existing)
-                        //                   Get.toNamed('/developer-properties',
-                        //                       arguments: {
-                        //                         'slug':
-                        //                             dev['developer_slug'] ?? "",
-                        //                       });
-                        //                 },
-                        //               );
-                        //             },
-                        //           );
-                        //         }),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
-
                         SizedBox(
                           height: 250,
                           child: Row(
@@ -1942,7 +2028,6 @@ class _HomePageState extends State<HomePage> {
                                                   slug: property[
                                                           'property_slug'] ??
                                                       "",
-                                                  property: property,
                                                 ),
                                               );
                                             },

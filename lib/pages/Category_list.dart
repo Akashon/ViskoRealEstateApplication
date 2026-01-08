@@ -372,7 +372,6 @@ class _CategoryPropertyPageState extends State<CategoryPropertyPage> {
                                 Get.to(
                                   () => PropertyDetailPage(
                                     slug: property['property_slug'] ?? "",
-                                    property: property,
                                   ),
                                 );
                               },

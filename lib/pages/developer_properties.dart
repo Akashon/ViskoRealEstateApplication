@@ -1,17 +1,20 @@
 import 'dart:ui';
 import 'dart:convert';
+import 'package:flutter/cupertino.dart' show CupertinoNavigationBarBackButton;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+
 import 'package:visko_rocky_flutter/component/home_property_card.dart';
-import 'package:visko_rocky_flutter/component/inquiry_form.dart';
 import 'package:visko_rocky_flutter/pages/property_detail_page.dart';
 import '../controller/theme_controller.dart';
 import 'package:visko_rocky_flutter/theme/app_theme.dart';
+import 'package:visko_rocky_flutter/config/colors.dart';
 
 class DeveloperProperties extends StatefulWidget {
   final String slug;
   const DeveloperProperties({required this.slug, super.key});
+
   @override
   State<DeveloperProperties> createState() => _DeveloperPropertiesState();
 }
@@ -36,15 +39,11 @@ class _DeveloperPropertiesState extends State<DeveloperProperties> {
 
     if (response.statusCode == 200) {
       final result = jsonDecode(response.body);
-      if (result['developer'] != null) {
-        setState(() {
-          developer = result['developer'];
-          properties = result['properties'] ?? [];
-          isLoading = false;
-        });
-      } else {
-        setState(() => isLoading = false);
-      }
+      setState(() {
+        developer = result['developer'];
+        properties = result['properties'] ?? [];
+        isLoading = false;
+      });
     } else {
       setState(() => isLoading = false);
     }
@@ -57,122 +56,105 @@ class _DeveloperPropertiesState extends State<DeveloperProperties> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: Stack(
-        children: [
-          /// ------------------- GLASS HEADER -------------------
-          Container(
-            height: MediaQuery.of(context).size.height * 0.26,
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(18),
-                bottomRight: Radius.circular(18),
-              ),
-              gradient: LinearGradient(
-                colors: isDark
-                    ? [Colors.black87, Colors.black54]
-                    : [
-                        kPrimaryOrange.withOpacity(0.7),
-                        Colors.orange.shade200.withOpacity(0.4)
-                      ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-          ),
-
-          SafeArea(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : developer == null
-                    ? const Center(child: Text("Developer not found"))
-                    : Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: ListView(
-                          children: [
-                            const SizedBox(height: 10),
-
-                            /// ------------------- TOP BAR -------------------
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                _glassBackButton(glass),
-                                Text(
-                                  developer!['developer_name'] ?? '',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: glass.textPrimary,
-                                  ),
-                                ),
-                                const SizedBox(width: 40),
-                              ],
-                            ),
-
-                            const SizedBox(height: 18),
-
-                            /// ------------------- DEVELOPER HEADER -------------------
-                            _buildDeveloperHeader(glass),
-
-                            const SizedBox(height: 26),
-
-                            Text(
-                              "Properties by ${developer!['developer_name']}",
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                                color: glass.textPrimary,
-                              ),
-                            ),
-
-                            const SizedBox(height: 14),
-
-                            /// ------------------- PROPERTY LIST -------------------
-                            ...properties.map(
-                              (p) => HomePropertyCard(
-                                property: p,
-                                isDark: isDark,
-                                onTap: () {
-                                  Get.to(() => PropertyDetailPage(
-                                        slug: p['property_slug'],
-                                        property: null,
-                                      ));
-                                },
-                                image: null,
-                              ),
-                            ),
-                          ],
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : developer == null
+              ? Center(
+                  child: Text(
+                    "Developer not found",
+                    style: TextStyle(color: glass.textSecondary),
+                  ),
+                )
+              : CustomScrollView(
+                  slivers: [
+                    /// ---------------- APP BAR ----------------
+                    SliverAppBar(
+                      pinned: true,
+                      elevation: 0,
+                      backgroundColor: glass.solidSurface,
+                      surfaceTintColor: glass.solidSurface,
+                      leading: CupertinoNavigationBarBackButton(
+                        color: glass.textPrimary,
+                      ),
+                      centerTitle: true,
+                      title: Text(
+                        developer!['developer_name'],
+                        style: TextStyle(
+                          color: glass.textPrimary,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 17,
                         ),
                       ),
-          ),
-        ],
-      ),
+                    ),
+
+                    /// ---------------- DEVELOPER CARD (STACKED) ----------------
+                    SliverPersistentHeader(
+                      pinned: true,
+                      delegate: _StickyTitleDelegate(
+                        height: 180,
+                        child: Container(
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                          padding: const EdgeInsets.fromLTRB(16, 18, 16, 10),
+                          child: _buildDeveloperHeader(glass),
+                        ),
+                      ),
+                    ),
+
+                    /// ---------------- TITLE STICKY ----------------
+                    SliverPersistentHeader(
+                      pinned: true,
+                      delegate: _StickyTitleDelegate(
+                        height: 56,
+                        child: Container(
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Properties by ${developer!['developer_name']}",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: glass.textPrimary,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    /// ---------------- PROPERTY LIST ----------------
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            final p = properties[index];
+                            return HomePropertyCard(
+                              property: p,
+                              isDark: isDark,
+                              image: null,
+                              onTap: () {
+                                Get.to(
+                                  () => PropertyDetailPage(
+                                    slug: p['property_slug'],
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                          childCount: properties.length,
+                        ),
+                      ),
+                    ),
+
+                    const SliverToBoxAdapter(
+                      child: SizedBox(height: 24),
+                    ),
+                  ],
+                ),
     );
   }
 
-  /// ------------------- BACK BUTTON -------------------
-  Widget _glassBackButton(GlassColors glass) {
-    return GestureDetector(
-      onTap: () => Navigator.pop(context),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(50),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
-          child: Container(
-            height: 40,
-            width: 40,
-            decoration: BoxDecoration(
-              color: glass.cardBackground,
-              shape: BoxShape.circle,
-              border: Border.all(color: glass.glassBorder),
-            ),
-            child: Icon(Icons.arrow_back_rounded, color: glass.textPrimary),
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// ------------------- DEVELOPER HEADER CARD -------------------
+  /// ---------------- DEVELOPER HEADER ----------------
   Widget _buildDeveloperHeader(GlassColors glass) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(22),
@@ -186,7 +168,6 @@ class _DeveloperPropertiesState extends State<DeveloperProperties> {
             border: Border.all(color: glass.glassBorder),
           ),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
                 height: 120,
@@ -194,41 +175,30 @@ class _DeveloperPropertiesState extends State<DeveloperProperties> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: glass.glassBorder),
-                  color: glass.cardBackground,
+                  color: glass.glassBackground,
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    alignment: Alignment.center,
-                    child: Image.network(
-                      developer!['developer_logo'] ?? '',
-                      fit: BoxFit.contain,
-                    ),
+                  child: Image.network(
+                    developer!['developer_logo'] ?? '',
+                    fit: BoxFit.contain,
                   ),
                 ),
               ),
-
               const SizedBox(width: 14),
-
-              /// DETAILS
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    /// Developer Name — larger, cleaner
                     Text(
-                      developer!['developer_name'] ?? '',
+                      developer!['developer_name'],
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
                         color: glass.textPrimary,
                       ),
                     ),
-
                     const SizedBox(height: 8),
-
-                    /// City Row — neat + spacing
                     Row(
                       children: [
                         Icon(Icons.location_on,
@@ -245,10 +215,7 @@ class _DeveloperPropertiesState extends State<DeveloperProperties> {
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 10),
-
-                    /// Phone — subtle container (same color palette)
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 6),
@@ -280,4 +247,27 @@ class _DeveloperPropertiesState extends State<DeveloperProperties> {
       ),
     );
   }
+}
+
+/// ---------------- STICKY TITLE DELEGATE ----------------
+class _StickyTitleDelegate extends SliverPersistentHeaderDelegate {
+  final double height;
+  final Widget child;
+
+  _StickyTitleDelegate({required this.height, required this.child});
+
+  @override
+  double get minExtent => height;
+
+  @override
+  double get maxExtent => height;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return child;
+  }
+
+  @override
+  bool shouldRebuild(covariant _StickyTitleDelegate oldDelegate) => false;
 }

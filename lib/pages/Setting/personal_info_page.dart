@@ -503,7 +503,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 3),
           decoration: BoxDecoration(
             color: glass.cardBackground,
             borderRadius: BorderRadius.circular(25),

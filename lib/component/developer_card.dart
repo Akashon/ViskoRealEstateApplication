@@ -113,7 +113,7 @@ class DeveloperCard extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.star, size: 14, color: glass.textPrimary),
+                    Icon(Icons.star, size: 14, color: glass.solidSurface),
                     const SizedBox(width: 6),
                     Text(
                       (dev['rating'] ?? "4.8").toString(),

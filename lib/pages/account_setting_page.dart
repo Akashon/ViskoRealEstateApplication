@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:visko_rocky_flutter/controller/personal_info_controller.dart';
 
 import 'package:visko_rocky_flutter/pages/Setting/contact_information_page.dart';
@@ -14,6 +15,20 @@ import '../controller/theme_controller.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
+
+  Future<void> _openUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (!await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication, // 🔥 opens browser
+    )) {
+      Get.snackbar(
+        "Error",
+        "Could not open link",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,13 +97,13 @@ class SettingsPage extends StatelessWidget {
               glass,
               title: "App Settings",
               children: [
-                _switchTile(
-                  glass,
-                  title: "Notifications",
-                  icon: Icons.notifications_active,
-                  value: true.obs,
-                  primary: primary, // 🔥 UPDATED
-                ),
+                // _switchTile(
+                //   glass,
+                //   title: "Notifications",
+                //   icon: Icons.notifications_active,
+                //   value: true.obs,
+                //   primary: primary, // 🔥 UPDATED
+                // ),
                 _switchTile(
                   glass,
                   title: "Dark Mode",
@@ -110,18 +125,72 @@ class SettingsPage extends StatelessWidget {
                 ),
               ],
             ),
-            _sectionCard(
-              glass,
-              title: "Talk to Property Advisor",
-              children: [
-                _settingTile(
-                  glass,
-                  Icons.chat_bubble_outline,
-                  "Schedule Call or Chat",
-                  onTap: () => Get.to(() => const PropertyAdvisorPage()),
-                ),
-              ],
-            ),
+            // _sectionCard(
+            //   glass,
+            //   title: "Talk to Property Advisor",
+            //   children: [
+            //     _settingTile(
+            //       glass,
+            //       Icons.chat_bubble_outline,
+            //       "Schedule Call or Chat",
+            //       onTap: () => Get.to(() => const PropertyAdvisorPage()),
+            //     ),
+            //   ],
+            // ),
+            // _sectionCard(
+            //   glass,
+            //   title: "Terms & Privacy",
+            //   children: [
+            //     _settingTile(
+            //       glass,
+            //       Icons.privacy_tip,
+            //       "Privacy Policy",
+            //       onTap: () => Get.to(
+            //         () => const LegalWebViewPage(
+            //           title: "Privacy Policy",
+            //           url:
+            //               "https://viskorealestate.com/#/policies/privacy-policy",
+            //         ),
+            //       ),
+            //     ),
+            //     _settingTile(
+            //       glass,
+            //       Icons.cookie,
+            //       "Fraud Alert",
+            //       onTap: () => Get.to(
+            //         () => const LegalWebViewPage(
+            //           title: "Fraud Alert",
+            //           url: "https://viskorealestate.com/#/policies/fraud-alert",
+            //         ),
+            //       ),
+            //     ),
+            //     _settingTile(
+            //       glass,
+            //       Icons.description,
+            //       "Terms & Conditions",
+            //       onTap: () => Get.to(
+            //         () => const LegalWebViewPage(
+            //           title: "Terms & Conditions",
+            //           url:
+            //               "https://viskorealestate.com/#/policies/terms-conditions",
+            //         ),
+            //       ),
+            //     ),
+            //     _settingTile(
+            //       glass,
+            //       Icons.description,
+            //       "Trust & Safety",
+            //       onTap: () => Get.to(
+            //         () => const LegalWebViewPage(
+            //           title: "Trust & Safety",
+            //           url:
+            //               "https://viskorealestate.com/#/policies/trust-safety",
+            //         ),
+            //       ),
+            //     ),
+            //   ],
+            // ),
+
             _sectionCard(
               glass,
               title: "Terms & Privacy",
@@ -130,37 +199,37 @@ class SettingsPage extends StatelessWidget {
                   glass,
                   Icons.privacy_tip,
                   "Privacy Policy",
-                  onTap: () => Get.to(
-                    () => const LegalWebViewPage(
-                      title: "Privacy Policy",
-                      url: "https://yourdomain.com/privacy-policy",
-                    ),
+                  onTap: () => _openUrl(
+                    "https://viskorealestate.com/#/policies/privacy-policy",
                   ),
                 ),
                 _settingTile(
                   glass,
                   Icons.cookie,
-                  "Cookies Policy",
-                  onTap: () => Get.to(
-                    () => const LegalWebViewPage(
-                      title: "Cookies Policy",
-                      url: "https://yourdomain.com/cookies-policy",
-                    ),
+                  "Fraud Alert",
+                  onTap: () => _openUrl(
+                    "https://viskorealestate.com/#/policies/fraud-alert",
                   ),
                 ),
                 _settingTile(
                   glass,
                   Icons.description,
                   "Terms & Conditions",
-                  onTap: () => Get.to(
-                    () => const LegalWebViewPage(
-                      title: "Terms & Conditions",
-                      url: "https://yourdomain.com/terms",
-                    ),
+                  onTap: () => _openUrl(
+                    "https://viskorealestate.com/#/policies/terms-conditions",
+                  ),
+                ),
+                _settingTile(
+                  glass,
+                  Icons.description,
+                  "Trust & Safety",
+                  onTap: () => _openUrl(
+                    "https://viskorealestate.com/#/policies/trust-safety",
                   ),
                 ),
               ],
             ),
+
             const SizedBox(height: 40),
           ],
         ),

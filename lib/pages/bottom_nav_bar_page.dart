@@ -152,6 +152,7 @@ import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:get/get.dart';
 import 'package:visko_rocky_flutter/component/inquiry_form.dart';
+import 'package:visko_rocky_flutter/config/colors.dart';
 import 'package:visko_rocky_flutter/pages/Categories_page.dart';
 import 'package:visko_rocky_flutter/pages/home.dart';
 import 'package:visko_rocky_flutter/pages/favorite_page.dart';
@@ -231,8 +232,8 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
               ),
               _buildIcon(
                 selected: _pageIndex == 1,
-                active: Icons.category_rounded,
-                inactive: Icons.category_outlined,
+                active: Icons.apartment_outlined,
+                inactive: Icons.apartment_outlined,
               ),
               _buildIcon(
                 selected: _pageIndex == 2,

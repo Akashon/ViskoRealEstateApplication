@@ -138,7 +138,6 @@ class AllPropertyPage extends StatelessWidget {
                     Get.to(
                       () => PropertyDetailPage(
                         slug: property['property_slug'] ?? "",
-                        property: property,
                       ),
                     );
                   },

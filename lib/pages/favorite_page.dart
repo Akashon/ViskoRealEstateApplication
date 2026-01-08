@@ -220,7 +220,6 @@ class _FavoritePageState extends State<FavoritePage> {
                           Get.to(
                             () => PropertyDetailPage(
                               slug: property['property_slug'] ?? "",
-                              property: property,
                             ),
                           );
                         },

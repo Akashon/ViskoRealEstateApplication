@@ -177,13 +177,15 @@ class _FavoritePageState extends State<FavoritePage> {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    Text(
-                      "Your saved properties",
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: glass.textSecondary, // theme color
-                      ),
-                    ),
+                    Obx(() => Text(
+                          favCtrl.favoriteList.isEmpty
+                              ? "Your saved properties"
+                              : "${favCtrl.favoriteList.length} saved propert${favCtrl.favoriteList.length == 1 ? 'y' : 'ies'}",
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: glass.textSecondary,
+                          ),
+                        )),
                   ],
                 ),
               ),

@@ -30,6 +30,7 @@ class DeveloperCard extends StatelessWidget {
             // Background Image
             Positioned.fill(
               child: Container(
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: glass.cardBackground,
                   borderRadius: BorderRadius.circular(20),
@@ -44,16 +45,6 @@ class DeveloperCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                // child: ClipRRect(
-                //   borderRadius: BorderRadius.circular(20),
-                //   child: CachedNetworkImage(
-                //     imageUrl:
-                //         dev['developer_banner'] ?? dev['developer_logo'] ?? '',
-                //     width: double.infinity,
-                //     height: 150,
-                //     fit: BoxFit.contain,
-                //   ),
-                // ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                   child: CachedNetworkImage(
@@ -128,6 +119,36 @@ class DeveloperCard extends StatelessWidget {
             ),
 
             // Glass bottom panel
+            // 🟢 TOP-LEFT DEVELOPER LOGO
+            Positioned(
+              top: 12,
+              left: 12,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(30),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                  // Type badge
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: glass.glassBackground,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: glass.glassBorder),
+                    ),
+                    child: Text(
+                      dev['developer_type'] ?? 'Builder',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
             Positioned(
               left: 12,
               right: 12,
@@ -185,25 +206,6 @@ class DeveloperCard extends StatelessWidget {
                         ),
 
                         const SizedBox(width: 10),
-
-                        // Type badge
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: glass.glassBackground,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: glass.glassBorder),
-                          ),
-                          child: Text(
-                            dev['developer_type'] ?? 'Builder',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),

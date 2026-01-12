@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:ui';
+import 'package:flutter/cupertino.dart' show CupertinoNavigationBarBackButton;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -232,6 +233,10 @@ class _MyFilterPropertyPageState extends State<MyFilterPropertyPage> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
+        leading: CupertinoNavigationBarBackButton(
+          color: glass.textPrimary,
+          onPressed: Get.back,
+        ),
         backgroundColor: Theme.of(context).primaryColor.withOpacity(0.08),
         elevation: 0,
         title: const Text(

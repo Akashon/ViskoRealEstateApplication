@@ -62,6 +62,7 @@
 //   }
 // }
 
+import 'package:flutter/cupertino.dart' show CupertinoNavigationBarBackButton;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:visko_rocky_flutter/component/home_property_card.dart';
@@ -85,7 +86,10 @@ class AllPropertyPage extends StatelessWidget {
 
       appBar: AppBar(
         elevation: 0,
-
+        leading: CupertinoNavigationBarBackButton(
+          color: glass.textPrimary,
+          onPressed: Get.back,
+        ),
         // 🔥 UPDATED – AppBar background glass + theme
         backgroundColor: glass.solidSurface,
 

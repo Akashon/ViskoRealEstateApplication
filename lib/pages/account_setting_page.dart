@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:visko_rocky_flutter/controller/contact_info_controller.dart';
 import 'package:visko_rocky_flutter/controller/personal_info_controller.dart';
 
 import 'package:visko_rocky_flutter/pages/Setting/contact_information_page.dart';
@@ -52,15 +53,15 @@ class SettingsPage extends StatelessWidget {
           backgroundColor: glass.solidSurface, // 🔥 UPDATED (no transparent)
           elevation: 0,
           iconTheme: IconThemeData(color: glass.textPrimary), // 🔥 UPDATED
-          actions: [
-            IconButton(
-              icon: Icon(
-                isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-                color: glass.textPrimary, // 🔥 UPDATED
-              ),
-              onPressed: themeController.toggleTheme,
-            )
-          ],
+          // actions: [
+          //   IconButton(
+          //     icon: Icon(
+          //       isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+          //       color: glass.textPrimary, // 🔥 UPDATED
+          //     ),
+          //     onPressed: themeController.toggleTheme,
+          //   )
+          // ],
         ),
 
         // ---------------- BODY ----------------
@@ -95,7 +96,7 @@ class SettingsPage extends StatelessWidget {
             ),
             _sectionCard(
               glass,
-              title: "App Settings",
+              title: "Appearance",
               children: [
                 // _switchTile(
                 //   glass,
@@ -120,7 +121,7 @@ class SettingsPage extends StatelessWidget {
                 _settingTile(
                   glass,
                   Icons.support_agent,
-                  "Email • Call • WhatsApp",
+                  "Email • Call ",
                   onTap: () => SupportBottomSheet.show(context),
                 ),
               ],
@@ -243,6 +244,7 @@ class SettingsPage extends StatelessWidget {
 
   Widget _profile(GlassColors glass) {
     final info = Get.find<PersonalInfoController>();
+    final contact = Get.find<ContactInfoController>();
 
     return Obx(() => ClipRRect(
           borderRadius: BorderRadius.circular(30),
@@ -260,27 +262,55 @@ class SettingsPage extends StatelessWidget {
                   CircleAvatar(
                     radius: 32,
                     backgroundColor: glass.solidSurface,
+                    child: Icon(Icons.person, color: glass.textSecondary),
                   ),
                   const SizedBox(width: 15),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        info.name.value.isEmpty ? "Your Name" : info.name.value,
-                        style: TextStyle(
-                          color: glass.textPrimary,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          info.name.value.isEmpty
+                              ? "Your Name"
+                              : info.name.value,
+                          style: TextStyle(
+                              color: glass.textPrimary,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold),
                         ),
-                      ),
-                      Text(
-                        info.gender.value,
-                        style: TextStyle(
-                          color: glass.textSecondary,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
+                        // Text(info.gender.value,
+                        //     style: TextStyle(
+                        //         color: glass.textSecondary, fontSize: 13)),
+                        // const SizedBox(height: 6),
+                        if (contact.mobile.value.isNotEmpty)
+                          Row(
+                            children: [
+                              Icon(Icons.phone,
+                                  size: 14, color: glass.textSecondary),
+                              const SizedBox(width: 6),
+                              Text(contact.mobile.value,
+                                  style: TextStyle(
+                                      color: glass.textSecondary,
+                                      fontSize: 13)),
+                            ],
+                          ),
+                        if (contact.email.value.isNotEmpty)
+                          Row(
+                            children: [
+                              Icon(Icons.email,
+                                  size: 14, color: glass.textSecondary),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(contact.email.value,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        color: glass.textSecondary,
+                                        fontSize: 13)),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
                   )
                 ],
               ),

@@ -12,19 +12,12 @@ import 'package:visko_rocky_flutter/component/inquiry_form.dart';
 import 'package:visko_rocky_flutter/controller/favorite_controller.dart';
 import 'package:visko_rocky_flutter/theme/app_theme.dart';
 
-// final favCtrl = Get.find<FavoriteController>();
-// final int propertyId = property['property_id'];
-
 const String baseURL = "https://apimanager.viskorealestate.com";
 
 class HomePropertyCard extends StatefulWidget {
   final Map property;
   final bool isDark;
   final VoidCallback onTap;
-
-  /// This callback removes the card from Favorite List page
-  // final VoidCallback? onFavoriteRemoved;
-
   const HomePropertyCard({
     super.key,
     required this.property,
@@ -40,86 +33,7 @@ class HomePropertyCard extends StatefulWidget {
 
 class _HomePropertyCardState extends State<HomePropertyCard>
     with SingleTickerProviderStateMixin {
-  // bool isFavorite = false;
-  // bool loadingFav = false;
-
-  // small press animation
   double _scale = 1.0;
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   checkFavoriteStatus();
-  // }
-
-  /// 🔍 Check if THIS property is already in user's favorites
-  // Future<void> checkFavoriteStatus() async {
-  //   try {
-  //     final response = await http.get(Uri.parse("$baseURL/favorites/user"));
-
-  //     if (response.statusCode == 200) {
-  //       final data = json.decode(response.body);
-
-  //       List favList = [];
-  //       if (data['favorite_properties'] != null) {
-  //         favList = data['favorite_properties'];
-  //       } else if (data['favorites'] != null) {
-  //         favList = data['favorites'];
-  //       } else if (data['data'] != null) {
-  //         favList = data['data'];
-  //       }
-
-  //       final id = widget.property['property_id'];
-
-  //       setState(() {
-  //         isFavorite = favList
-  //             .any((item) => item['property_id'].toString() == id.toString());
-  //       });
-  //     }
-  //   } catch (e) {
-  //     // silent fail - leave isFavorite as is
-  //     debugPrint("Error fetching favorites: $e");
-  //   }
-  // }
-
-  // /// ❤️ Toggle Add / Remove From Favorites
-  // Future<void> toggleFavorite() async {
-  //   if (loadingFav) return;
-  //   setState(() {
-  //     loadingFav = true;
-  //     // optimistic UI update
-  //     isFavorite = !isFavorite;
-  //   });
-
-  //   final propertyId = widget.property['property_id'];
-  //   final url = isFavorite
-  //       ? "$baseURL/api/favorites/add"
-  //       : "$baseURL/api/favorites/remove";
-
-  //   try {
-  //     final response =
-  //         await http.post(Uri.parse(url), body: {"property_id": "$propertyId"});
-
-  //     // if failure, rollback optimistic update
-  //     if (response.statusCode != 200) {
-  //       setState(() => isFavorite = !isFavorite);
-  //     } else {
-  //       // If removed AND card is shown in Favorite List
-  //       if (!isFavorite && widget.onFavoriteRemoved != null) {
-  //         // delay a tiny bit for animation smoothness
-  //         await Future.delayed(const Duration(milliseconds: 150));
-  //         widget.onFavoriteRemoved!();
-  //       }
-  //     }
-  //   } catch (e) {
-  //     debugPrint("Favorite Toggle Exception: $e");
-  //     setState(() => isFavorite = !isFavorite);
-  //   } finally {
-  //     if (mounted) {
-  //       setState(() => loadingFav = false);
-  //     }
-  //   }
-  // }
 
   final FavoriteController favCtrl = Get.find<FavoriteController>();
 
@@ -281,11 +195,14 @@ class _HomePropertyCardState extends State<HomePropertyCard>
                                 Icon(Icons.square_foot,
                                     size: 16, color: primary),
                                 const SizedBox(width: 6),
-                                Text(
-                                  sizeText,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: glass.textSecondary,
+                                Expanded(
+                                  child: Text(
+                                    sizeText,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: glass.textSecondary,
+                                    ),
                                   ),
                                 ),
                               ],

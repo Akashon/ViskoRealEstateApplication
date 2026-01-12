@@ -290,7 +290,7 @@
 //                     Row(
 //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
 //                       children: [
-//                         glassCircleAvatar(),
+//                         glassCircleLogo(),
 //                         Column(
 //                           children: [
 //                             Text(
@@ -873,7 +873,7 @@
 //   );
 // }
 
-// Widget glassCircleAvatar() {
+// Widget glassCircleLogo() {
 //   final glass = Theme.of(Get.context!).extension<GlassColors>()!;
 //   return ClipRRect(
 //     borderRadius: BorderRadius.circular(40),
@@ -1368,7 +1368,7 @@ class _HomePageState extends State<HomePage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                glassCircleAvatar(),
+                                glassCircleLogo(),
                                 Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -2112,8 +2112,9 @@ Widget glassButton({required IconData icon}) {
   );
 }
 
-Widget glassCircleAvatar() {
+Widget glassCircleLogo() {
   final glass = Theme.of(Get.context!).extension<GlassColors>()!;
+
   return ClipRRect(
     borderRadius: BorderRadius.circular(40),
     child: BackdropFilter(
@@ -2121,21 +2122,21 @@ Widget glassCircleAvatar() {
       child: Container(
         width: 48,
         height: 48,
-        padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
           color: glass.glassBackground,
           borderRadius: BorderRadius.circular(40),
           border: Border.all(color: glass.glassBorder),
         ),
-        child: ClipOval(
-          child: Image.network(
-            'https://viskohr.com/static/media/Visko_logo.096d8e010f7b30432a17.png',
-            // 'https://viskohr.com/static/media/viskologo.c8d5be31d9819c924a6d.webp',
-            fit: BoxFit.contain, // 👈 keeps logo fully visible
-            // errorBuilder: (_, __, ___) => const Icon(
-            //   Icons.business,
-            //   size: 20,
-            // ),
+        child: Center(
+          child: SizedBox(
+            width: 26, // 👈 key: force logo size
+            height: 26,
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: Image.network(
+                'https://viskohr.com/static/media/Visko_logo.096d8e010f7b30432a17.png',
+              ),
+            ),
           ),
         ),
       ),

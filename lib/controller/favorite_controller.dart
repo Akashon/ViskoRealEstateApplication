@@ -148,4 +148,6 @@ class FavoriteController extends GetxController {
       body: {"property_id": id},
     );
   }
+
+  isItemLoading(String propertyId) {}
 }
